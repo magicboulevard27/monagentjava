@@ -44,4 +44,76 @@ public class IncidentEvidenceEntity {
 
     protected IncidentEvidenceEntity() {
     }
+
+    public UUID getEvidenceId() {
+        return evidenceId;
+    }
+
+    public void setEvidenceId(UUID evidenceId) {
+        this.evidenceId = evidenceId;
+    }
+
+    public UUID getIncidentId() {
+        return incidentId;
+    }
+
+    public void setIncidentId(UUID incidentId) {
+        this.incidentId = incidentId;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getEvidenceType() {
+        return evidenceType;
+    }
+
+    public void setEvidenceType(String evidenceType) {
+        this.evidenceType = evidenceType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Instant getObservedAt() {
+        return observedAt;
+    }
+
+    public void setObservedAt(Instant observedAt) {
+        this.observedAt = observedAt;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public String getRedactedPayload() {
+        return redactedPayload;
+    }
+
+    public void setRedactedPayload(String redactedPayload) {
+        this.redactedPayload = redactedPayload;
+    }
 }

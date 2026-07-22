@@ -70,3 +70,60 @@ monagent:
     observability:
       metrics-export-endpoint: ${MONAGENT_METRICS_ENDPOINT:http://localhost:9090}
       tracing-export-endpoint: ${MONAGENT_TRACING_ENDPOINT:http://localhost:4317}
+  collectors:
+    health:
+      timeout: ${MONAGENT_HEALTH_TIMEOUT:PT5S}
+      interval-seconds: ${MONAGENT_HEALTH_INTERVAL_SECONDS:60}
+      retry-count: ${MONAGENT_HEALTH_RETRY_COUNT:1}
+    logs:
+      endpoint: ${MONAGENT_LOGS_ENDPOINT:http://localhost:9200/_search}
+      timeout: ${MONAGENT_LOGS_TIMEOUT:PT10S}
+      window-minutes: ${MONAGENT_LOGS_WINDOW_MINUTES:15}
+    traces:
+      endpoint: ${MONAGENT_TRACES_ENDPOINT:http://localhost:16686/api/traces}
+      timeout: ${MONAGENT_TRACES_TIMEOUT:PT10S}
+      window-minutes: ${MONAGENT_TRACES_WINDOW_MINUTES:15}
+    kubernetes:
+      endpoint: ${MONAGENT_KUBERNETES_ENDPOINT:http://localhost:8001/apis/monitoring.monagent.io/v1/events}
+      timeout: ${MONAGENT_KUBERNETES_TIMEOUT:PT10S}
+      window-minutes: ${MONAGENT_KUBERNETES_WINDOW_MINUTES:15}
+    prometheus:
+      timeout: ${MONAGENT_PROMETHEUS_TIMEOUT:PT10S}
+      interval-seconds: ${MONAGENT_PROMETHEUS_INTERVAL_SECONDS:60}
+      queries:
+        - name: cpu
+          promql: ${MONAGENT_PROMETHEUS_CPU_QUERY:avg(rate(process_cpu_seconds_total[5m]))}
+          unit: ${MONAGENT_PROMETHEUS_CPU_UNIT:cores}
+        - name: memory
+          promql: ${MONAGENT_PROMETHEUS_MEMORY_QUERY:process_resident_memory_bytes}
+          unit: ${MONAGENT_PROMETHEUS_MEMORY_UNIT:bytes}
+        - name: jvm.heap
+          promql: ${MONAGENT_PROMETHEUS_JVM_HEAP_QUERY:jvm_memory_used_bytes{area="heap"}}
+          unit: ${MONAGENT_PROMETHEUS_JVM_HEAP_UNIT:bytes}
+        - name: gc.pause
+          promql: ${MONAGENT_PROMETHEUS_GC_PAUSE_QUERY:rate(jvm_gc_pause_seconds_sum[5m])}
+          unit: ${MONAGENT_PROMETHEUS_GC_PAUSE_UNIT:seconds}
+        - name: request.rate
+          promql: ${MONAGENT_PROMETHEUS_REQUEST_RATE_QUERY:sum(rate(http_server_requests_seconds_count[5m]))}
+          unit: ${MONAGENT_PROMETHEUS_REQUEST_RATE_UNIT:rps}
+        - name: error.rate
+          promql: ${MONAGENT_PROMETHEUS_ERROR_RATE_QUERY:sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m]))}
+          unit: ${MONAGENT_PROMETHEUS_ERROR_RATE_UNIT:rps}
+        - name: request.latency
+          promql: ${MONAGENT_PROMETHEUS_LATENCY_QUERY:http_server_requests_seconds_max}
+          unit: ${MONAGENT_PROMETHEUS_LATENCY_UNIT:seconds}
+        - name: db.pool
+          promql: ${MONAGENT_PROMETHEUS_DB_POOL_QUERY:hikaricp_connections_active}
+          unit: ${MONAGENT_PROMETHEUS_DB_POOL_UNIT:connections}
+        - name: kafka.lag
+          promql: ${MONAGENT_PROMETHEUS_KAFKA_LAG_QUERY:kafka_consumer_group_lag}
+          unit: ${MONAGENT_PROMETHEUS_KAFKA_LAG_UNIT:messages}
+        - name: thread.pool
+          promql: ${MONAGENT_PROMETHEUS_THREAD_POOL_QUERY:executor_active_threads}
+          unit: ${MONAGENT_PROMETHEUS_THREAD_POOL_UNIT:threads}
+  async:
+    dispatch-timeout: ${MONAGENT_ASYNC_DISPATCH_TIMEOUT:PT30S}
+    worker-threads: ${MONAGENT_ASYNC_WORKER_THREADS:4}
+    queue-capacity: ${MONAGENT_ASYNC_QUEUE_CAPACITY:100}
+    collector-pool-size: ${MONAGENT_ASYNC_COLLECTOR_POOL_SIZE:4}
+    dispatch-interval-ms: ${MONAGENT_ASYNC_DISPATCH_INTERVAL_MS:60000}

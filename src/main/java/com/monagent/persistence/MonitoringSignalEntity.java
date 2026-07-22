@@ -47,4 +47,84 @@ public class MonitoringSignalEntity {
 
     protected MonitoringSignalEntity() {
     }
+
+    public UUID getSignalId() {
+        return signalId;
+    }
+
+    public void setSignalId(UUID signalId) {
+        this.signalId = signalId;
+    }
+
+    public UUID getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(UUID serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getSignalName() {
+        return signalName;
+    }
+
+    public void setSignalName(String signalName) {
+        this.signalName = signalName;
+    }
+
+    public String getSignalValue() {
+        return signalValue;
+    }
+
+    public void setSignalValue(String signalValue) {
+        this.signalValue = signalValue;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public Instant getCollectedAt() {
+        return collectedAt;
+    }
+
+    public void setCollectedAt(Instant collectedAt) {
+        this.collectedAt = collectedAt;
+    }
+
+    public String getRawReference() {
+        return rawReference;
+    }
+
+    public void setRawReference(String rawReference) {
+        this.rawReference = rawReference;
+    }
 }
