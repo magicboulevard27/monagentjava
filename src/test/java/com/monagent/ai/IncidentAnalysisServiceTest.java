@@ -6,6 +6,7 @@ import com.monagent.analysis.AnomalyOutcome;
 import com.monagent.analysis.IncidentCandidate;
 import com.monagent.analysis.IncidentEvidence;
 import com.monagent.analysis.ThresholdComparator;
+import com.monagent.web.SelfObservabilityMetrics;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -35,7 +36,8 @@ class IncidentAnalysisServiceTest {
         IncidentAnalysisService service = new IncidentAnalysisService(
                 new StubIncidentAnalysisClient(response),
                 new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor()),
-                new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()));
+                new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()),
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
         IncidentCandidate candidate = new IncidentCandidate(
                 UUID.randomUUID(),
@@ -81,7 +83,8 @@ class IncidentAnalysisServiceTest {
         IncidentAnalysisService service = new IncidentAnalysisService(
                 prompt -> { throw new RuntimeException("offline"); },
                 new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor()),
-                new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()));
+                new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()),
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
         AiAnalysisResult result = service.analyze(new AiAnalysisRequest(
                 List.of(new AnomalyOutcome(

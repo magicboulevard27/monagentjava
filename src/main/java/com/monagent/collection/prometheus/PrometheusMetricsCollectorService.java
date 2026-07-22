@@ -5,6 +5,7 @@ import com.monagent.collection.MonitoringSignalPersistenceService;
 import com.monagent.collection.SignalNormalizationService;
 import com.monagent.collection.model.NormalizedSignal;
 import com.monagent.domain.MonitoredService;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,14 @@ public class PrometheusMetricsCollectorService {
 
     @Scheduled(fixedDelayString = "${monagent.collectors.prometheus.interval-seconds:60}000")
     public void collect() {
+        List<NormalizedSignal> batch = new ArrayList<>();
         for (MonitoredService service : monitoredServiceService.list()) {
             if (!service.enabled()) {
                 continue;
             }
-            collect(service);
+            batch.addAll(collect(service));
         }
+        persistenceService.saveAll(batch);
     }
 
     public List<NormalizedSignal> collect(MonitoredService service) {

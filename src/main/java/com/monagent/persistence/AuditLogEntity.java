@@ -38,4 +38,60 @@ public class AuditLogEntity {
 
     protected AuditLogEntity() {
     }
+
+    public UUID getAuditId() {
+        return auditId;
+    }
+
+    public void setAuditId(UUID auditId) {
+        this.auditId = auditId;
+    }
+
+    public String getActor() {
+        return actor;
+    }
+
+    public void setActor(String actor) {
+        this.actor = actor;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
+    }
+
+    public UUID getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(UUID entityId) {
+        this.entityId = entityId;
+    }
+
+    public String getEventPayload() {
+        return eventPayload;
+    }
+
+    public void setEventPayload(String eventPayload) {
+        this.eventPayload = eventPayload;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 }

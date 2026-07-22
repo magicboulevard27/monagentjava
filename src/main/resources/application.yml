@@ -16,6 +16,11 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate.jdbc.batch_size: ${MONAGENT_JPA_BATCH_SIZE:50}
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.jdbc.batch_versioned_data: true
   flyway:
     enabled: true
   security:
@@ -36,6 +41,12 @@ management:
     health:
       probes:
         enabled: true
+      show-details: always
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
 
 monitoring:
   application-name: ${spring.application.name}

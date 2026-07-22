@@ -3,6 +3,12 @@ spring:
     url: ${MONAGENT_DATASOURCE_URL}
     username: ${MONAGENT_DATASOURCE_USERNAME}
     password: ${MONAGENT_DATASOURCE_PASSWORD}
+  jpa:
+    properties:
+      hibernate.jdbc.batch_size: ${MONAGENT_JPA_BATCH_SIZE:50}
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.jdbc.batch_versioned_data: true
 
 monagent:
   runtime:
@@ -12,4 +18,3 @@ monagent:
       base-url: ${MONAGENT_OLLAMA_BASE_URL}
       model: ${MONAGENT_OLLAMA_MODEL:llama3.1:8b-instruct}
       request-timeout-seconds: ${MONAGENT_OLLAMA_TIMEOUT_SECONDS:30}
-

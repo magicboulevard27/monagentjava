@@ -6,6 +6,7 @@ import com.monagent.analysis.IncidentEvidence;
 import com.monagent.analysis.IncidentImpact;
 import com.monagent.analysis.IncidentLifecycleState;
 import com.monagent.analysis.IncidentSeverityClassifier;
+import com.monagent.web.SelfObservabilityMetrics;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -18,20 +19,23 @@ public class IncidentAnalysisService {
     private final IncidentAnalysisClient client;
     private final IncidentAnalysisPromptBuilder promptBuilder;
     private final IncidentAnalysisResultParser resultParser;
+    private final SelfObservabilityMetrics metrics;
 
     public IncidentAnalysisService(IncidentAnalysisClient client,
                                    IncidentAnalysisPromptBuilder promptBuilder,
-                                   IncidentAnalysisResultParser resultParser) {
+                                   IncidentAnalysisResultParser resultParser,
+                                   SelfObservabilityMetrics metrics) {
         this.client = client;
         this.promptBuilder = promptBuilder;
         this.resultParser = resultParser;
+        this.metrics = metrics;
     }
 
     public AiAnalysisResult analyze(AiAnalysisRequest request) {
         String prompt = promptBuilder.build(request);
         Instant started = Instant.now();
         try {
-            String raw = client.analyze(prompt);
+            String raw = metrics.time("monagent.ai.analysis.latency", "ollama", () -> client.analyze(prompt));
             Instant finished = Instant.now();
             IncidentAnalysisResultParser.ParsedIncidentAnalysis parsed = resultParser.parse(raw);
             List<String> availableEvidenceIds = request.evidence().stream().map(item -> item.evidenceId().toString()).toList();

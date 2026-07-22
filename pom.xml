@@ -24,6 +24,7 @@
         <json.schema.validator.version>1.5.1</json.schema.validator.version>
         <spotbugs.maven.plugin.version>4.8.6.0</spotbugs.maven.plugin.version>
         <owasp.dependency.check.maven.plugin.version>10.0.4</owasp.dependency.check.maven.plugin.version>
+        <cyclonedx.maven.plugin.version>2.8.2</cyclonedx.maven.plugin.version>
     </properties>
 
     <dependencies>
@@ -149,6 +150,19 @@
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
                 <version>${owasp.dependency.check.maven.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
+                <version>${cyclonedx.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>makeAggregateBom</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

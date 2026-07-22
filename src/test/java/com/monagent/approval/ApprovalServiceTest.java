@@ -11,6 +11,8 @@ import com.monagent.persistence.ApprovalEntity;
 import com.monagent.persistence.ApprovalRepository;
 import com.monagent.persistence.RecommendationEntity;
 import com.monagent.persistence.RecommendationRepository;
+import com.monagent.audit.AuditService;
+import com.monagent.web.SelfObservabilityMetrics;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +25,12 @@ class ApprovalServiceTest {
     void requestsApprovalsForRequiringRecommendations() {
         ApprovalRepository approvalRepository = mock(ApprovalRepository.class);
         RecommendationRepository recommendationRepository = mock(RecommendationRepository.class);
-        ApprovalService service = new ApprovalService(approvalRepository, recommendationRepository);
+        AuditService auditService = mock(AuditService.class);
+        ApprovalService service = new ApprovalService(
+                approvalRepository,
+                recommendationRepository,
+                auditService,
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
         UUID recommendationId = UUID.randomUUID();
         RecommendationEntity recommendation = recommendation(recommendationId, RecommendationActionType.RESTART_SERVICE, true);
@@ -41,7 +48,12 @@ class ApprovalServiceTest {
     void blocksSelfApproval() {
         ApprovalRepository approvalRepository = mock(ApprovalRepository.class);
         RecommendationRepository recommendationRepository = mock(RecommendationRepository.class);
-        ApprovalService service = new ApprovalService(approvalRepository, recommendationRepository);
+        AuditService auditService = mock(AuditService.class);
+        ApprovalService service = new ApprovalService(
+                approvalRepository,
+                recommendationRepository,
+                auditService,
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
         UUID recommendationId = UUID.randomUUID();
         ApprovalEntity approval = new ApprovalEntity();
@@ -60,7 +72,12 @@ class ApprovalServiceTest {
     void rejectsDuplicateApprovalDecisions() {
         ApprovalRepository approvalRepository = mock(ApprovalRepository.class);
         RecommendationRepository recommendationRepository = mock(RecommendationRepository.class);
-        ApprovalService service = new ApprovalService(approvalRepository, recommendationRepository);
+        AuditService auditService = mock(AuditService.class);
+        ApprovalService service = new ApprovalService(
+                approvalRepository,
+                recommendationRepository,
+                auditService,
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
         UUID recommendationId = UUID.randomUUID();
         RecommendationEntity recommendation = recommendation(recommendationId, RecommendationActionType.ROLLBACK_DEPLOYMENT, true);

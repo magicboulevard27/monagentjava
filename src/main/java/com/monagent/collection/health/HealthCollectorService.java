@@ -8,6 +8,7 @@ import com.monagent.collection.model.SignalStatus;
 import com.monagent.api.service.MonitoredServiceService;
 import com.monagent.domain.MonitoredService;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,12 +37,19 @@ public class HealthCollectorService {
 
     @Scheduled(fixedDelayString = "${monagent.collectors.health.interval-seconds:60}000")
     public void collect() {
+        List<NormalizedSignal> batch = new ArrayList<>();
         for (MonitoredService service : monitoredServiceService.list()) {
             if (!service.enabled()) {
                 continue;
             }
-            collect(service);
+            try {
+                HealthCollectionResult result = collect(service);
+                batch.add(result.signal());
+            } catch (RuntimeException ex) {
+                // Continue the batch so one bad endpoint does not stop unrelated services.
+            }
         }
+        persistenceService.saveAll(batch);
     }
 
     public HealthCollectionResult collect(MonitoredService service) {

@@ -5,6 +5,8 @@ import com.monagent.persistence.ApprovalEntity;
 import com.monagent.persistence.ApprovalRepository;
 import com.monagent.persistence.RecommendationEntity;
 import com.monagent.persistence.RecommendationRepository;
+import com.monagent.audit.AuditService;
+import com.monagent.web.SelfObservabilityMetrics;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
 import java.util.List;
@@ -17,10 +19,14 @@ public class ApprovalService {
 
     private final ApprovalRepository approvalRepository;
     private final RecommendationRepository recommendationRepository;
+    private final AuditService auditService;
+    private final SelfObservabilityMetrics metrics;
 
-    public ApprovalService(ApprovalRepository approvalRepository, RecommendationRepository recommendationRepository) {
+    public ApprovalService(ApprovalRepository approvalRepository, RecommendationRepository recommendationRepository, AuditService auditService, SelfObservabilityMetrics metrics) {
         this.approvalRepository = approvalRepository;
         this.recommendationRepository = recommendationRepository;
+        this.auditService = auditService;
+        this.metrics = metrics;
     }
 
     @Transactional
@@ -38,6 +44,8 @@ public class ApprovalService {
         approval.setDecisionReason(reason);
         approval.setDecidedAt(null);
         approvalRepository.saveAndFlush(approval);
+        auditService.record(actor, "APPROVAL_REQUESTED", "recommendation", recommendationId, sanitize(reason));
+        metrics.incrementApprovalDecision(ApprovalStatus.REQUESTED.name());
         return toResponse(approval);
     }
 
@@ -52,6 +60,8 @@ public class ApprovalService {
         approval.setDecisionReason(reason);
         approval.setDecidedAt(Instant.now());
         approvalRepository.saveAndFlush(approval);
+        auditService.record(actor, "APPROVAL_APPROVED", "recommendation", recommendationId, sanitize(reason));
+        metrics.incrementApprovalDecision(ApprovalStatus.APPROVED.name());
         return toResponse(approval);
     }
 
@@ -63,6 +73,8 @@ public class ApprovalService {
         approval.setDecisionReason(reason);
         approval.setDecidedAt(Instant.now());
         approvalRepository.saveAndFlush(approval);
+        auditService.record(actor, "APPROVAL_REJECTED", "recommendation", recommendationId, sanitize(reason));
+        metrics.incrementApprovalDecision(ApprovalStatus.REJECTED.name());
         return toResponse(approval);
     }
 
@@ -108,5 +120,12 @@ public class ApprovalService {
                 approval.getDecisionReason(),
                 approval.getDecidedAt(),
                 approval.getVersion());
+    }
+
+    private String sanitize(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replaceAll("(?i)(password|secret|token|api[-_ ]?key)=[^\\s,;]+", "$1=[REDACTED]");
     }
 }

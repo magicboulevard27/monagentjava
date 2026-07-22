@@ -2,6 +2,7 @@ package com.monagent.notification;
 
 import com.monagent.analysis.IncidentCandidate;
 import com.monagent.analysis.Recommendation;
+import com.monagent.web.SelfObservabilityMetrics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,12 @@ public class NotificationDispatcher {
 
     private final Map<String, NotificationChannel> channels;
     private final NotificationTemplateRenderer renderer;
+    private final SelfObservabilityMetrics metrics;
 
-    public NotificationDispatcher(List<NotificationChannel> channels, NotificationTemplateRenderer renderer) {
+    public NotificationDispatcher(List<NotificationChannel> channels, NotificationTemplateRenderer renderer, SelfObservabilityMetrics metrics) {
         this.channels = channels.stream().collect(Collectors.toMap(NotificationChannel::channelName, Function.identity()));
         this.renderer = renderer;
+        this.metrics = metrics;
     }
 
     public List<NotificationDeliveryResult> dispatch(IncidentCandidate incident, List<Recommendation> recommendations, List<String> enabledChannels) {
@@ -28,9 +31,12 @@ public class NotificationDispatcher {
             NotificationChannel channel = channels.get(channelName);
             if (channel == null) {
                 results.add(new NotificationDeliveryResult(false, channelName, null, "Unsupported channel"));
+                metrics.incrementNotificationDelivery(channelName, false);
                 continue;
             }
-            results.add(retry(channel, message));
+            NotificationDeliveryResult result = retry(channel, message);
+            metrics.incrementNotificationDelivery(channelName, result.delivered());
+            results.add(result);
         }
         return results;
     }

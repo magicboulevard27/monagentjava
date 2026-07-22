@@ -33,6 +33,9 @@ public class IncidentReportRenderer {
         builder.append("Severity: ").append(document.incident().severity()).append('\n');
         builder.append("Status: ").append(document.incident().status()).append('\n');
         builder.append("Services: ").append(String.join(", ", document.incident().affectedServices())).append("\n\n");
+        if (document.evidence().isEmpty()) {
+            builder.append("> Degradation note: supporting evidence was not available at report time.\n\n");
+        }
         builder.append("## Summary\n").append(document.incident().summary()).append("\n\n");
         builder.append("## Evidence\n");
         for (IncidentEvidenceQueryResponse evidence : document.evidence()) {

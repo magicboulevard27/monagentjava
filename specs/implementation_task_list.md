@@ -301,51 +301,51 @@
 ## 21. Authentication, Authorization, and Security
 
 - [ ] Implement authenticated API access using the selected identity provider.
-- [ ] Define viewer, operator, approver, administrator, and service roles.
-- [ ] Enforce role-based access control on every API and action.
+- [x] Define viewer, operator, approver, administrator, and service roles.
+- [x] Enforce role-based access control on every API and action.
 - [ ] Configure TLS for all external and service-to-service connections.
 - [ ] Use read-only credentials for observability integrations where possible.
 - [ ] Enforce Kubernetes least-privilege RBAC.
 - [ ] Implement centralized input and output redaction.
 - [ ] Protect against SSRF, injection, path traversal, and unsafe deserialization.
-- [ ] Add request-size, rate, and timeout limits.
-- [ ] Add secure HTTP headers and restrictive CORS configuration.
+- [x] Add request-size, rate, and timeout limits.
+- [x] Add secure HTTP headers and restrictive CORS configuration.
 - [ ] Encrypt sensitive stored data where required.
 - [ ] Create a threat model for collectors, LLM prompts, APIs, and action execution.
 - [ ] Run static analysis, dependency scanning, secret scanning, and container scanning.
-- [ ] Complete security tests and remediate critical or high findings.
+- [x] Complete security tests and remediate critical or high findings.
 
-## 22. Audit Service and Data Governance
+## 22. Audit Service and Data Governance - Dịch vụ kiểm toán và quản trị dữ liệu
 
-- [ ] Define auditable events for analysis, recommendations, notifications, approvals, configuration, and actions.
-- [ ] Include actor, action, entity, timestamp, correlation ID, and redacted payload.
-- [ ] Make audit events append-only through the application API.
+- [x] Define auditable events for analysis, recommendations, notifications, approvals, configuration, and actions.
+- [x] Include actor, action, entity, timestamp, correlation ID, and redacted payload.
+- [x] Make audit events append-only through the application API.
 - [ ] Record failed and denied operations as well as successful operations.
 - [ ] Define audit retention, archival, access, and export requirements.
 - [ ] Add integrity controls appropriate to the compliance requirements.
-- [ ] Test audit completeness and sensitive-data exclusion.
+- [x] Test audit completeness and sensitive-data exclusion.
 
 ## 23. Reliability and Failure Handling
 
-- [ ] Continue analysis when health endpoints are unavailable.
+- [x] Continue analysis when health endpoints are unavailable.
 - [ ] Continue without traces when tracing is unavailable.
 - [ ] Continue without logs when log search is unavailable.
-- [ ] Generate rule-based alerts and evidence bundles when the LLM is unavailable.
-- [ ] Retry failed notifications and record final delivery failure.
+- [x] Generate rule-based alerts and evidence bundles when the LLM is unavailable.
+- [x] Retry failed notifications and record final delivery failure.
 - [ ] Define readiness behavior for mandatory and optional dependencies.
 - [ ] Add timeouts, retries, circuit breakers, and bulkheads to external calls.
-- [ ] Add graceful degradation indicators to incident reports.
+- [x] Add graceful degradation indicators to incident reports.
 - [ ] Run fault-injection tests for every external integration.
 - [ ] Document recovery procedures and dependency outage runbooks.
 
 ## 24. Monitoring Agent Self-Observability
 
-- [ ] Expose `/actuator/health` and `/actuator/info`.
-- [ ] Implement separate liveness and readiness health groups.
-- [ ] Expose collector success and failure counters.
+- [x] Expose `/actuator/health` and `/actuator/info`.
+- [x] Implement separate liveness and readiness health groups.
+- [x] Expose collector success and failure counters.
 - [ ] Expose source-query and AI-reasoning latency metrics.
-- [ ] Expose notification delivery and incident-analysis metrics.
-- [ ] Expose approval decision and worker queue metrics.
+- [x] Expose notification delivery and incident-analysis metrics.
+- [x] Expose approval decision and worker queue metrics.
 - [ ] Add structured JSON logs with correlation and incident IDs.
 - [ ] Export application traces using OpenTelemetry.
 - [ ] Create dashboards for API, collectors, workers, database, and integrations.
@@ -354,16 +354,16 @@
 
 ## 25. Performance and Scalability
 
-- [ ] Define expected service count, signal volume, incident volume, and retention.
+- [x] Define expected service count, signal volume, incident volume, and retention.
 - [ ] Verify health-check delay remains below 30 seconds.
 - [ ] Verify alert generation remains below 60 seconds after detection.
 - [ ] Verify incident-summary generation remains below 2 minutes.
 - [ ] Load-test concurrent collection and analysis workloads.
 - [ ] Tune HTTP connection pools, executors, queue sizes, and database pools.
-- [ ] Implement batching for signal and evidence persistence where appropriate.
+- [x] Implement batching for signal and evidence persistence where appropriate.
 - [ ] Partition or archive high-volume data when required.
 - [ ] Verify horizontal scaling and duplicate-work prevention.
-- [ ] Document capacity limits and scaling triggers.
+- [x] Document capacity limits and scaling triggers.
 
 ## 26. Testing and Quality Assurance
 
@@ -383,16 +383,16 @@
 
 ## 27. Build, CI/CD, and Release Automation
 
-- [ ] Create CI jobs for compile, unit test, integration test, and package.
-- [ ] Enforce formatting, static analysis, and coverage gates.
-- [ ] Run dependency, secret, license, and vulnerability scans.
-- [ ] Build a minimal non-root Linux container image.
-- [ ] Generate a Software Bill of Materials (SBOM).
+- [x] Create CI jobs for compile, unit test, integration test, and package.
+- [x] Enforce formatting, static analysis, and coverage gates.
+- [x] Run dependency, secret, license, and vulnerability scans.
+- [x] Build a minimal non-root Linux container image.
+- [x] Generate a Software Bill of Materials (SBOM).
 - [ ] Sign and publish versioned build artifacts and container images.
 - [ ] Configure deployment promotion across environments.
 - [ ] Add database migration checks and rollback procedures.
 - [ ] Add post-deployment smoke and health tests.
-- [ ] Define release notes, semantic versioning, and rollback criteria.
+- [x] Define release notes, semantic versioning, and rollback criteria.
 
 ## 28. Local Deployment with Docker Compose
 

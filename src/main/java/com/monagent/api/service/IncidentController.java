@@ -5,6 +5,7 @@ import com.monagent.analysis.IncidentCorrelationService;
 import com.monagent.analysis.IncidentEvidence;
 import com.monagent.analysis.Recommendation;
 import com.monagent.analysis.RecommendationEngineService;
+import com.monagent.audit.AuditService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -25,13 +26,16 @@ public class IncidentController {
     private final IncidentQueryService incidentQueryService;
     private final IncidentCorrelationService incidentCorrelationService;
     private final RecommendationEngineService recommendationEngineService;
+    private final AuditService auditService;
 
     public IncidentController(IncidentQueryService incidentQueryService,
                               IncidentCorrelationService incidentCorrelationService,
-                              RecommendationEngineService recommendationEngineService) {
+                              RecommendationEngineService recommendationEngineService,
+                              AuditService auditService) {
         this.incidentQueryService = incidentQueryService;
         this.incidentCorrelationService = incidentCorrelationService;
         this.recommendationEngineService = recommendationEngineService;
+        this.auditService = auditService;
     }
 
     @GetMapping("/incidents")
@@ -48,6 +52,7 @@ public class IncidentController {
         IncidentCandidate candidate = incidentCorrelationService.correlate(request.anomalies());
         List<IncidentEvidence> evidence = candidate.evidence();
         List<Recommendation> recommendations = recommendationEngineService.generate(candidate, evidence);
+        auditService.record("system", "INCIDENT_ANALYZED", "incident", candidate.incidentId(), candidate.summary());
         return new IncidentAnalysisResult(candidate, recommendations);
     }
 
