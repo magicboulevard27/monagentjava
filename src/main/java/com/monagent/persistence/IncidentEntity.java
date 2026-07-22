@@ -50,4 +50,92 @@ public class IncidentEntity {
 
     protected IncidentEntity() {
     }
+
+    public UUID getIncidentId() {
+        return incidentId;
+    }
+
+    public void setIncidentId(UUID incidentId) {
+        this.incidentId = incidentId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getSeverity() {
+        return severity;
+    }
+
+    public void setSeverity(String severity) {
+        this.severity = severity;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getAffectedServices() {
+        return affectedServices;
+    }
+
+    public void setAffectedServices(String affectedServices) {
+        this.affectedServices = affectedServices;
+    }
+
+    public Instant getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public Instant getDetectedAt() {
+        return detectedAt;
+    }
+
+    public void setDetectedAt(Instant detectedAt) {
+        this.detectedAt = detectedAt;
+    }
+
+    public Instant getResolvedAt() {
+        return resolvedAt;
+    }
+
+    public void setResolvedAt(Instant resolvedAt) {
+        this.resolvedAt = resolvedAt;
+    }
+
+    public String getLikelyRootCause() {
+        return likelyRootCause;
+    }
+
+    public void setLikelyRootCause(String likelyRootCause) {
+        this.likelyRootCause = likelyRootCause;
+    }
+
+    public String getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(String confidence) {
+        this.confidence = confidence;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
 }

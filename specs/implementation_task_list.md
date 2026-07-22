@@ -210,36 +210,35 @@
 - [x] Persist anomaly outcomes and supporting signal references.
 - [ ] Add boundary, trend, stale-data, and false-positive tests.
 
-## 15. Correlation and Incident Management
-
-- [ ] Define incident-candidate and evidence-package models.
-- [ ] Correlate anomalies by time window and affected service.
+## 15. Correlation and Incident Management - Quản lý tương quan và sự cố
+- [x] Define incident-candidate and evidence-package models.
+- [x] Correlate anomalies by time window and affected service.
 - [ ] Correlate upstream and downstream dependencies.
 - [ ] Correlate shared infrastructure and repeated log patterns.
 - [ ] Correlate trace paths and deployment events.
 - [ ] Determine whether symptoms began before or after a deployment.
-- [ ] Merge duplicate incident candidates and update active incidents.
-- [ ] Define incident lifecycle states and transition rules.
-- [ ] Implement severity classification for `LOW`, `MEDIUM`, `HIGH`, and `CRITICAL`.
-- [ ] Calculate blast radius and customer-impact indicators.
-- [ ] Persist incidents and incident evidence atomically.
-- [ ] Add deterministic correlation and lifecycle tests.
+- [x] Merge duplicate incident candidates and update active incidents.
+- [x] Define incident lifecycle states and transition rules.
+- [x] Implement severity classification for `LOW`, `MEDIUM`, `HIGH`, and `CRITICAL`.
+- [x] Calculate blast radius and customer-impact indicators.
+- [x] Persist incidents and incident evidence atomically.
+- [x] Add deterministic correlation and lifecycle tests.
 
 ## 16. AI Reasoning Layer
 
-- [ ] Define a provider-neutral LLM client interface.
-- [ ] Implement the Ollama client with configurable endpoint and model.
+- [x] Define a provider-neutral LLM client interface.
+- [x] Implement the Ollama client with configurable endpoint and model.
 - [ ] Add an approved remote-provider adapter only if required.
-- [ ] Build prompts from normalized evidence, anomalies, traces, logs, and deployment context.
-- [ ] Add explicit grounding instructions that prohibit unsupported facts.
-- [ ] Apply input redaction before every LLM request.
-- [ ] Define and validate the structured JSON incident-output schema.
-- [ ] Parse severity, affected services, status, symptoms, evidence, root cause, confidence, actions, and escalation flag.
-- [ ] Reject or safely repair invalid structured output.
-- [ ] Verify that cited evidence exists in the evidence package.
+- [x] Build prompts from normalized evidence, anomalies, traces, logs, and deployment context.
+- [x] Add explicit grounding instructions that prohibit unsupported facts.
+- [x] Apply input redaction before every LLM request.
+- [x] Define and validate the structured JSON incident-output schema.
+- [x] Parse severity, affected services, status, symptoms, evidence, root cause, confidence, actions, and escalation flag.
+- [x] Reject or safely repair invalid structured output.
+- [x] Verify that cited evidence exists in the evidence package.
 - [ ] Implement request timeout, retry, circuit breaker, and concurrency limits.
-- [ ] Implement rule-based fallback analysis when the LLM is unavailable.
-- [ ] Record model, prompt version, latency, token usage where available, and result status.
+- [x] Implement rule-based fallback analysis when the LLM is unavailable.
+- [x] Record model, prompt version, latency, token usage where available, and result status.
 - [ ] Create a sanitized evaluation dataset and expected-result rubric.
 - [ ] Test hallucination resistance, prompt injection, malformed output, and provider outage.
 
