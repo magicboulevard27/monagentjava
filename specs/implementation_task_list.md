@@ -286,17 +286,17 @@
 
 ## 20. REST API and Reporting
 
-- [ ] Implement `GET /api/v1/incidents` with filtering and pagination.
-- [ ] Implement `POST /api/v1/incidents/analyze`.
-- [ ] Implement `GET /api/v1/incidents/{incidentId}`.
-- [ ] Implement `GET /api/v1/incidents/{incidentId}/evidence`.
-- [ ] Implement `GET /api/v1/incidents/{incidentId}/recommendations`.
-- [ ] Implement `GET /api/v1/reports/incidents/{incidentId}`.
-- [ ] Implement Markdown and JSON report endpoints.
+- [x] Implement `GET /api/v1/incidents` with filtering and pagination.
+- [x] Implement `POST /api/v1/incidents/analyze`.
+- [x] Implement `GET /api/v1/incidents/{incidentId}`.
+- [x] Implement `GET /api/v1/incidents/{incidentId}/evidence`.
+- [x] Implement `GET /api/v1/incidents/{incidentId}/recommendations`.
+- [x] Implement `GET /api/v1/reports/incidents/{incidentId}`.
+- [x] Implement Markdown and JSON report endpoints.
 - [ ] Add Jakarta Bean Validation and consistent error responses.
 - [ ] Add API pagination, sorting, filtering, and request limits.
 - [ ] Generate and maintain an OpenAPI specification.
-- [ ] Add controller, validation, security, and contract tests.
+- [x] Add controller, validation, security, and contract tests.
 
 ## 21. Authentication, Authorization, and Security
 
