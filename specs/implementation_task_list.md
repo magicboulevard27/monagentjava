@@ -367,18 +367,18 @@
 
 ## 26. Testing and Quality Assurance
 
-- [ ] Establish unit-test coverage targets for domain and business logic.
-- [ ] Add integration tests for PostgreSQL and external adapters.
+- [x] Establish unit-test coverage targets for domain and business logic.
+- [x] Add integration tests for PostgreSQL and external adapters.
 - [ ] Add REST API contract and backward-compatibility tests.
-- [ ] Add end-to-end tests from signal collection through notification.
+- [x] Add end-to-end tests from signal collection through notification.
 - [ ] Add security and authorization tests.
-- [ ] Add AI evaluation and regression tests.
+- [x] Add AI evaluation and regression tests.
 - [ ] Add resilience and partial-source-failure tests.
 - [ ] Add Linux installation and runtime tests.
 - [ ] Add Docker Compose environment tests.
 - [ ] Add Kubernetes deployment and upgrade tests.
 - [ ] Add performance, soak, and concurrency tests.
-- [ ] Maintain sanitized fixtures for metrics, logs, traces, and Kubernetes events.
+- [x] Maintain sanitized fixtures for metrics, logs, traces, and Kubernetes events.
 - [ ] Produce test reports and resolve all release-blocking defects.
 
 ## 27. Build, CI/CD, and Release Automation
@@ -396,26 +396,26 @@
 
 ## 28. Local Deployment with Docker Compose
 
-- [ ] Create a production-like Dockerfile for the Java application.
-- [ ] Create Docker Compose services for PostgreSQL and the monitoring agent.
-- [ ] Add optional Prometheus, OpenSearch, Jaeger/Tempo, and Ollama services.
-- [ ] Add named volumes and health checks.
-- [ ] Add sample service-registration and threshold configuration.
-- [ ] Document Linux startup, shutdown, reset, and troubleshooting commands.
+- [x] Create a production-like Dockerfile for the Java application.
+- [x] Create Docker Compose services for PostgreSQL and the monitoring agent.
+- [x] Add optional Prometheus, OpenSearch, Jaeger/Tempo, and Ollama services.
+- [x] Add named volumes and health checks.
+- [x] Add sample service-registration and threshold configuration.
+- [x] Document Linux startup, shutdown, reset, and troubleshooting commands.
 - [ ] Verify the complete MVP flow in Docker Compose.
 
 ## 29. Kubernetes and Helm Deployment
 
-- [ ] Create Deployments for API, collector worker, analysis worker, and notification worker.
-- [ ] Create Services, ConfigMaps, Secrets references, and service accounts.
+- [x] Create Deployments for API, collector worker, analysis worker, and notification worker.
+- [x] Create Services, ConfigMaps, Secrets references, and service accounts.
 - [ ] Create least-privilege Roles and RoleBindings.
-- [ ] Configure liveness, readiness, and startup probes.
-- [ ] Configure resource requests and limits.
-- [ ] Configure horizontal pod autoscaling and pod disruption budgets.
-- [ ] Configure topology spread or anti-affinity for availability.
-- [ ] Configure NetworkPolicies and secure ingress.
-- [ ] Create Helm charts with environment-specific values.
-- [ ] Add optional Ollama deployment guidance and resource requirements.
+- [x] Configure liveness, readiness, and startup probes.
+- [x] Configure resource requests and limits.
+- [x] Configure horizontal pod autoscaling and pod disruption budgets.
+- [x] Configure topology spread or anti-affinity for availability.
+- [x] Configure NetworkPolicies and secure ingress.
+- [x] Create Helm charts with environment-specific values.
+- [x] Add optional Ollama deployment guidance and resource requirements.
 - [ ] Validate rolling upgrade, rollback, failover, and disaster recovery.
 
 ## 30. Documentation and Operational Readiness

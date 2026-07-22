@@ -1,0 +1,29 @@
+{{- if .Values.ollama.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "monagentjava.fullname" . }}-ollama
+  labels:
+    {{- include "monagentjava.labels" . | nindent 4 }}
+    app.kubernetes.io/component: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "monagentjava.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: ollama
+  template:
+    metadata:
+      labels:
+        {{- include "monagentjava.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: ollama
+    spec:
+      containers:
+        - name: ollama
+          image: "{{ .Values.ollama.image.repository }}:{{ .Values.ollama.image.tag }}"
+          ports:
+            - containerPort: 11434
+              name: ollama
+          resources:
+            {{- toYaml .Values.ollama.resources | nindent 12 }}
+{{- end -}}

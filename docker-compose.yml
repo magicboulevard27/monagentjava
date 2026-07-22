@@ -1,0 +1,98 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-monagent}
+      POSTGRES_USER: ${POSTGRES_USER:-monagent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-monagent}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-monagent} -d ${POSTGRES_DB:-monagent}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  monagent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      MONAGENT_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-monagent}
+      MONAGENT_DATASOURCE_USERNAME: ${POSTGRES_USER:-monagent}
+      MONAGENT_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-monagent}
+      MONAGENT_OLLAMA_BASE_URL: ${MONAGENT_OLLAMA_BASE_URL:-http://ollama:11434}
+      MONAGENT_OLLAMA_MODEL: ${MONAGENT_OLLAMA_MODEL:-llama3.1:8b-instruct}
+      MONAGENT_NOTIFICATION_CHANNEL_1: ${MONAGENT_NOTIFICATION_CHANNEL_1:-slack}
+      MONAGENT_NOTIFICATION_CHANNEL_2: ${MONAGENT_NOTIFICATION_CHANNEL_2:-email}
+      MONAGENT_ASYNC_QUEUE_CAPACITY: ${MONAGENT_ASYNC_QUEUE_CAPACITY:-100}
+      MONAGENT_ASYNC_WORKER_THREADS: ${MONAGENT_ASYNC_WORKER_THREADS:-4}
+      MONAGENT_ASYNC_COLLECTOR_POOL_SIZE: ${MONAGENT_ASYNC_COLLECTOR_POOL_SIZE:-4}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/monagent-local.properties:/etc/monagent/monagent-reload.properties:ro
+      - monagent-data:/var/lib/monagent
+      - monagent-logs:/var/log/monagent
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health >/dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    profiles: ["observability"]
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+
+  opensearch:
+    image: opensearchproject/opensearch:2.16.0
+    profiles: ["observability"]
+    environment:
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    profiles: ["observability"]
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+
+  ollama:
+    image: ollama/ollama:0.3.14
+    profiles: ["ai"]
+    volumes:
+      - ollama-data:/root/.ollama
+    ports:
+      - "11434:11434"
+
+volumes:
+  postgres-data:
+  monagent-data:
+  monagent-logs:
+  prometheus-data:
+  opensearch-data:
+  ollama-data:

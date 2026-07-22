@@ -1,0 +1,123 @@
+image:
+  repository: monagentjava
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount:
+  api: 1
+  collector: 1
+  analysis: 1
+  notification: 1
+
+serviceAccount:
+  create: true
+  name: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources:
+  api:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  worker:
+    requests:
+      cpu: 200m
+      memory: 384Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+
+probes:
+  startup:
+    path: /actuator/health
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 18
+  readiness:
+    path: /actuator/health/readiness
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 3
+  liveness:
+    path: /actuator/health/liveness
+    initialDelaySeconds: 30
+    periodSeconds: 20
+    failureThreshold: 3
+
+env:
+  springProfiles: kubernetes
+  datasourceUrl: jdbc:postgresql://postgresql:5432/monagent
+  datasourceUsername: monagent
+  datasourcePassword: monagent
+  ollamaBaseUrl: http://ollama:11434
+  ollamaModel: llama3.1:8b-instruct
+  notificationChannel1: slack
+  notificationChannel2: email
+
+config:
+  create: true
+  logLevel: INFO
+  queueCapacity: "100"
+  workerThreads: "4"
+  collectorPoolSize: "4"
+  dispatchIntervalMs: "60000"
+  healthIntervalSeconds: "60"
+  prometheusIntervalSeconds: "60"
+  logsIntervalSeconds: "60"
+  tracesIntervalSeconds: "60"
+  kubernetesIntervalSeconds: "60"
+
+autoscaling:
+  enabled: true
+  api:
+    minReplicas: 1
+    maxReplicas: 3
+  workers:
+    minReplicas: 1
+    maxReplicas: 4
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+topologySpreadConstraints:
+  enabled: true
+
+networkPolicy:
+  enabled: true
+
+ollama:
+  enabled: false
+  image:
+    repository: ollama/ollama
+    tag: 0.3.14
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+postgresql:
+  enabled: false
+  host: postgresql
+  port: 5432
+
+ingress:
+  enabled: false
+  className: ""
+  hosts:
+    - host: monagent.local
+      paths:
+        - path: /
+          pathType: Prefix

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "monagentjava.fullname" . }}-collector
+  labels:
+    {{- include "monagentjava.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collector
+spec:
+  replicas: {{ .Values.replicaCount.collector }}
+  selector:
+    matchLabels:
+      {{- include "monagentjava.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: collector
+  template:
+    metadata:
+      labels:
+        {{- include "monagentjava.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: collector
+    spec:
+      serviceAccountName: {{ include "monagentjava.serviceAccountName" . }}
+      containers:
+        - name: monagent
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - secretRef:
+                name: {{ include "monagentjava.fullname" . }}-secrets
+            - configMapRef:
+                name: {{ include "monagentjava.fullname" . }}-config
+          env:
+            - name: MONAGENT_ROLE
+              value: collector
+          resources:
+            {{- toYaml .Values.resources.worker | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}

@@ -1,0 +1,77 @@
+{{- if .Values.autoscaling.enabled -}}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "monagentjava.fullname" . }}-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "monagentjava.fullname" . }}-api
+  minReplicas: {{ .Values.autoscaling.api.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.api.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "monagentjava.fullname" . }}-collector
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "monagentjava.fullname" . }}-collector
+  minReplicas: {{ .Values.autoscaling.workers.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.workers.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "monagentjava.fullname" . }}-analysis
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "monagentjava.fullname" . }}-analysis
+  minReplicas: {{ .Values.autoscaling.workers.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.workers.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "monagentjava.fullname" . }}-notification
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "monagentjava.fullname" . }}-notification
+  minReplicas: {{ .Values.autoscaling.workers.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.workers.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+{{- end -}}

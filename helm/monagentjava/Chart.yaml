@@ -1,0 +1,6 @@
+apiVersion: v2
+name: monagentjava
+description: AI-powered microservices health monitoring agent
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
