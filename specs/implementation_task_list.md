@@ -54,52 +54,52 @@
 - [x] Create a `systemd` unit for non-containerized deployment if required.
 - [x] Configure log rotation for host-based deployment.
 - [x] Add Linux shell scripts for startup, shutdown, health check, and diagnostics.
-- [ ] Validate installation and operation without root privileges.
+- [x] Validate installation and operation without root privileges.
 
 ## 4. Configuration and Secrets Management
 
-- [ ] Define typed configuration properties for all integrations.
-- [ ] Define service-level and environment-level monitoring configuration.
-- [ ] Add configuration validation at application startup.
-- [ ] Support secrets through environment variables and mounted secret files.
-- [ ] Integrate the selected environment-specific secret manager.
-- [ ] Prevent secrets from appearing in logs, metrics, exceptions, or API responses.
-- [ ] Implement safe defaults and explicit production overrides.
-- [ ] Document required configuration variables and sample values.
-- [ ] Add configuration reload behavior where safe and supported.
+- [x] Define typed configuration properties for all integrations.
+- [x] Define service-level and environment-level monitoring configuration.
+- [x] Add configuration validation at application startup.
+- [x] Support secrets through environment variables and mounted secret files.
+- [x] Integrate the selected environment-specific secret manager.
+- [x] Prevent secrets from appearing in logs, metrics, exceptions, or API responses.
+- [x] Implement safe defaults and explicit production overrides.
+- [x] Document required configuration variables and sample values.
+- [x] Add configuration reload behavior where safe and supported.
 
 ## 5. Database and Persistence Layer
 
-- [ ] Create database migration scripts for `monitored_services`.
-- [ ] Create database migration scripts for `monitoring_signals`.
-- [ ] Create database migration scripts for `incidents`.
-- [ ] Create database migration scripts for `incident_evidence`.
-- [ ] Create database migration scripts for `recommendations`.
-- [ ] Create database migration scripts for `approvals`.
-- [ ] Create database migration scripts for `audit_logs`.
-- [ ] Add primary keys, foreign keys, constraints, and status enumerations.
-- [ ] Add indexes for service, environment, severity, status, and timestamp queries.
-- [ ] Define JSON/JSONB columns for structured event payloads where appropriate.
-- [ ] Implement JPA entities and repository interfaces.
+- [x] Create database migration scripts for `monitored_services`.
+- [x] Create database migration scripts for `monitoring_signals`.
+- [x] Create database migration scripts for `incidents`.
+- [x] Create database migration scripts for `incident_evidence`.
+- [x] Create database migration scripts for `recommendations`.
+- [x] Create database migration scripts for `approvals`.
+- [x] Create database migration scripts for `audit_logs`.
+- [x] Add primary keys, foreign keys, constraints, and status enumerations.
+- [x] Add indexes for service, environment, severity, status, and timestamp queries.
+- [x] Define JSON/JSONB columns for structured event payloads where appropriate.
+- [x] Implement JPA entities and repository interfaces.
 - [ ] Implement transaction boundaries for incident creation and updates.
-- [ ] Implement optimistic locking for approvals and incident state changes.
+- [x] Implement optimistic locking for approvals and incident state changes.
 - [ ] Define retention and archival policies for signals, evidence, and audit records.
-- [ ] Add PostgreSQL integration tests using Testcontainers.
+- [x] Add PostgreSQL integration tests using Testcontainers.
 
 ## 6. Service Registry
 
-- [ ] Implement the monitored-service domain model and validation rules.
-- [ ] Implement create, read, update, list, and delete service operations.
-- [ ] Implement `GET /api/v1/services`.
-- [ ] Implement `POST /api/v1/services`.
-- [ ] Implement `GET /api/v1/services/{serviceId}`.
-- [ ] Implement `PUT /api/v1/services/{serviceId}`.
-- [ ] Implement `DELETE /api/v1/services/{serviceId}`.
-- [ ] Support development, test, staging, and production environments.
-- [ ] Validate health URL, Prometheus job, log index, trace service, namespace, and workload fields.
-- [ ] Store owner-team and alert-channel metadata.
+- [x] Implement the monitored-service domain model and validation rules.
+- [x] Implement create, read, update, list, and delete service operations.
+- [x] Implement `GET /api/v1/services`.
+- [x] Implement `POST /api/v1/services`.
+- [x] Implement `GET /api/v1/services/{serviceId}`.
+- [x] Implement `PUT /api/v1/services/{serviceId}`.
+- [x] Implement `DELETE /api/v1/services/{serviceId}`.
+- [x] Support development, test, staging, and production environments.
+- [x] Validate health URL, Prometheus job, log index, trace service, namespace, and workload fields.
+- [x] Store owner-team and alert-channel metadata.
 - [ ] Prevent collectors from processing disabled services.
-- [ ] Add unit, repository, and API tests.
+- [x] Add unit, repository, and API tests.
 
 ## 7. Common Signal Model and Normalization
 

@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: ${MONAGENT_DATASOURCE_URL}
+    username: ${MONAGENT_DATASOURCE_USERNAME}
+    password: ${MONAGENT_DATASOURCE_PASSWORD}
+
+monagent:
+  runtime:
+    timezone: ${MONAGENT_TIMEZONE:UTC}
+  integrations:
+    ollama:
+      base-url: ${MONAGENT_OLLAMA_BASE_URL}
+      model: ${MONAGENT_OLLAMA_MODEL:llama3.1:8b-instruct}
+      request-timeout-seconds: ${MONAGENT_OLLAMA_TIMEOUT_SECONDS:30}
+

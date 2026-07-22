@@ -3,6 +3,11 @@ spring:
     name: monagentjava
   profiles:
     active: local
+    group:
+      production:
+        - linux
+      staging:
+        - linux
   datasource:
     url: ${MONAGENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monagent}
     username: ${MONAGENT_DATASOURCE_USERNAME:monagent}
@@ -17,6 +22,10 @@ spring:
     user:
       name: ${MONAGENT_BASIC_AUTH_USER:admin}
       password: ${MONAGENT_BASIC_AUTH_PASSWORD:change-me}
+  config:
+    import:
+      - optional:configtree:/etc/monagent/secrets/
+      - optional:configtree:/run/secrets/
 
 management:
   endpoints:
@@ -33,7 +42,31 @@ monitoring:
   default-timezone: UTC
 
 monagent:
+  reload:
+    file: ${MONAGENT_RELOAD_FILE:/etc/monagent/monagent-reload.properties}
   runtime:
     timezone: ${MONAGENT_TIMEZONE:UTC}
     log-directory: ${MONAGENT_LOG_DIR:/var/log/monagent}
     data-directory: ${MONAGENT_DATA_DIR:/var/lib/monagent}
+  integrations:
+    database:
+      url: ${MONAGENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monagent}
+      username: ${MONAGENT_DATASOURCE_USERNAME:monagent}
+      password: ${MONAGENT_DATASOURCE_PASSWORD:monagent}
+      schema: ${MONAGENT_DATABASE_SCHEMA:public}
+    ollama:
+      base-url: ${MONAGENT_OLLAMA_BASE_URL:http://localhost:11434}
+      model: ${MONAGENT_OLLAMA_MODEL:llama3.1:8b-instruct}
+      request-timeout-seconds: ${MONAGENT_OLLAMA_TIMEOUT_SECONDS:30}
+    notifications:
+      enabled-channels:
+        - ${MONAGENT_NOTIFICATION_CHANNEL_1:slack}
+        - ${MONAGENT_NOTIFICATION_CHANNEL_2:email}
+      from-address: ${MONAGENT_NOTIFICATION_FROM:monagent@example.com}
+    auth:
+      issuer-uri: ${MONAGENT_AUTH_ISSUER_URI:https://login.microsoftonline.com/common/v2.0}
+      audience: ${MONAGENT_AUTH_AUDIENCE:api://monagentjava}
+      default-role-claim: ${MONAGENT_AUTH_ROLE_CLAIM:roles}
+    observability:
+      metrics-export-endpoint: ${MONAGENT_METRICS_ENDPOINT:http://localhost:9090}
+      tracing-export-endpoint: ${MONAGENT_TRACING_ENDPOINT:http://localhost:4317}
