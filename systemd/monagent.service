@@ -1,0 +1,24 @@
+[Unit]
+Description=Monagent Java Monitoring Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=monagent
+Group=monagent
+WorkingDirectory=/opt/monagent
+Environment=SPRING_PROFILES_ACTIVE=production
+Environment=JAVA_OPTS=-XX:+UseG1GC -XX:MaxRAMPercentage=75.0 -Duser.timezone=UTC
+ExecStart=/opt/monagent/scripts/start-linux.sh
+ExecStop=/opt/monagent/scripts/stop-linux.sh
+SuccessExitStatus=143
+TimeoutStartSec=60
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+

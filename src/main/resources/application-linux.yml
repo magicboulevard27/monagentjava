@@ -1,0 +1,10 @@
+spring:
+  main:
+    banner-mode: "off"
+
+monagent:
+  runtime:
+    timezone: UTC
+    log-directory: /var/log/monagent
+    data-directory: /var/lib/monagent
+

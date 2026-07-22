@@ -1,0 +1,10 @@
+/.idea/
+/.vscode/
+/target/
+/.mvn/wrapper/maven-wrapper.jar
+*.log
+*.tmp
+*.swp
+Thumbs.db
+*.iml
+
