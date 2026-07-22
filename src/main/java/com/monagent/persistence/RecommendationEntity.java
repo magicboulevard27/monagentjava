@@ -41,4 +41,76 @@ public class RecommendationEntity {
 
     protected RecommendationEntity() {
     }
+
+    public UUID getRecommendationId() {
+        return recommendationId;
+    }
+
+    public void setRecommendationId(UUID recommendationId) {
+        this.recommendationId = recommendationId;
+    }
+
+    public UUID getIncidentId() {
+        return incidentId;
+    }
+
+    public void setIncidentId(UUID incidentId) {
+        this.incidentId = incidentId;
+    }
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getRiskLevel() {
+        return riskLevel;
+    }
+
+    public void setRiskLevel(String riskLevel) {
+        this.riskLevel = riskLevel;
+    }
+
+    public boolean isRequiresApproval() {
+        return requiresApproval;
+    }
+
+    public void setRequiresApproval(boolean requiresApproval) {
+        this.requiresApproval = requiresApproval;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getEvidenceSummary() {
+        return evidenceSummary;
+    }
+
+    public void setEvidenceSummary(String evidenceSummary) {
+        this.evidenceSummary = evidenceSummary;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 }

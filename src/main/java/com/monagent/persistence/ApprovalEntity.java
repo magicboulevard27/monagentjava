@@ -40,4 +40,68 @@ public class ApprovalEntity {
 
     protected ApprovalEntity() {
     }
+
+    public UUID getApprovalId() {
+        return approvalId;
+    }
+
+    public void setApprovalId(UUID approvalId) {
+        this.approvalId = approvalId;
+    }
+
+    public UUID getRecommendationId() {
+        return recommendationId;
+    }
+
+    public void setRecommendationId(UUID recommendationId) {
+        this.recommendationId = recommendationId;
+    }
+
+    public String getRequestedBy() {
+        return requestedBy;
+    }
+
+    public void setRequestedBy(String requestedBy) {
+        this.requestedBy = requestedBy;
+    }
+
+    public String getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(String approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public String getDecisionReason() {
+        return decisionReason;
+    }
+
+    public void setDecisionReason(String decisionReason) {
+        this.decisionReason = decisionReason;
+    }
+
+    public Instant getDecidedAt() {
+        return decidedAt;
+    }
+
+    public void setDecidedAt(Instant decidedAt) {
+        this.decidedAt = decidedAt;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
 }

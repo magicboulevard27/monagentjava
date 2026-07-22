@@ -244,45 +244,45 @@
 
 ## 17. Recommendation Engine
 
-- [ ] Define recommendation action types and risk levels.
-- [ ] Map evidence and analysis to practical remediation recommendations.
-- [ ] Require supporting evidence for each recommendation.
-- [ ] Generate restart, scaling, database-pool, rollback, dependency, resource, Kafka-lag, and configuration recommendations.
-- [ ] Mark recommendations that require human approval.
-- [ ] Prevent unsupported or unsafe executable actions.
-- [ ] Persist recommendation status and evidence summary.
-- [ ] Add mapping, risk-classification, and safety tests.
+- [x] Define recommendation action types and risk levels.
+- [x] Map evidence and analysis to practical remediation recommendations.
+- [x] Require supporting evidence for each recommendation.
+- [x] Generate restart, scaling, database-pool, rollback, dependency, resource, Kafka-lag, and configuration recommendations.
+- [x] Mark recommendations that require human approval.
+- [x] Prevent unsupported or unsafe executable actions.
+- [x] Persist recommendation status and evidence summary.
+- [x] Add mapping, risk-classification, and safety tests.
 
 ## 18. Notification and Incident Integrations
 
-- [ ] Define a provider-neutral notification interface.
-- [ ] Implement the selected MVP notification channel(s).
-- [ ] Add Slack integration if selected.
-- [ ] Add email integration if selected.
+- [x] Define a provider-neutral notification interface.
+- [x] Implement the selected MVP notification channel(s).
+- [x] Add Slack integration if selected.
+- [x] Add email integration if selected.
 - [ ] Add Microsoft Teams integration if selected.
 - [ ] Add Jira ticket creation if selected.
 - [ ] Add PagerDuty or Opsgenie integration if selected.
-- [ ] Include incident ID, severity, services, symptoms, root cause, confidence, evidence, and next steps.
-- [ ] Implement channel-specific templates and Markdown-safe rendering.
+- [x] Include incident ID, severity, services, symptoms, root cause, confidence, evidence, and next steps.
+- [x] Implement channel-specific templates and Markdown-safe rendering.
 - [ ] Add delivery retries, exponential backoff, deduplication, and failure auditing.
-- [ ] Prevent secrets and unredacted evidence from entering notifications.
-- [ ] Add integration contract tests using mock endpoints.
+- [x] Prevent secrets and unredacted evidence from entering notifications.
+- [x] Add integration contract tests using mock endpoints.
 
 ## 19. Approval Workflow and Controlled Actions
 
-- [ ] Define approver roles, separation of duties, and authorization rules.
-- [ ] Implement approval requests for rollback, restart, scaling, configuration change, and failover.
-- [ ] Implement `POST /api/v1/recommendations/{recommendationId}/approve`.
-- [ ] Implement `POST /api/v1/recommendations/{recommendationId}/reject`.
-- [ ] Implement `GET /api/v1/approvals`.
-- [ ] Require a decision reason and authenticated actor identity.
-- [ ] Prevent self-approval when policy requires separation of duties.
-- [ ] Prevent duplicate, stale, replayed, and expired approvals.
+- [x] Define approver roles, separation of duties, and authorization rules.
+- [x] Implement approval requests for rollback, restart, scaling, configuration change, and failover.
+- [x] Implement `POST /api/v1/recommendations/{recommendationId}/approve`.
+- [x] Implement `POST /api/v1/recommendations/{recommendationId}/reject`.
+- [x] Implement `GET /api/v1/approvals`.
+- [x] Require a decision reason and authenticated actor identity.
+- [x] Prevent self-approval when policy requires separation of duties.
+- [x] Prevent duplicate, stale, replayed, and expired approvals.
 - [ ] Revalidate target state immediately before executing an approved action.
 - [ ] Support safe automated actions such as alerting, ticket creation, diagnostic collection, and read-only inspection.
 - [ ] Keep production write actions disabled until explicitly configured.
 - [ ] Audit every request, decision, attempted action, and result.
-- [ ] Add authorization, concurrency, expiry, and replay-protection tests.
+- [x] Add authorization, concurrency, expiry, and replay-protection tests.
 
 ## 20. REST API and Reporting
 

@@ -1,0 +1,13 @@
+package com.monagent.analysis;
+
+public enum RecommendationActionType {
+    RESTART_SERVICE,
+    SCALE_UP,
+    SCALE_DATABASE_POOL,
+    ROLLBACK_DEPLOYMENT,
+    CHECK_DEPENDENCY,
+    ADJUST_RESOURCE_LIMITS,
+    INVESTIGATE_KAFKA_LAG,
+    REVIEW_CONFIGURATION,
+    NO_OP
+}
