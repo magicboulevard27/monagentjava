@@ -195,19 +195,19 @@
 - [x] Expose worker backlog, throughput, latency, and failure metrics.
 - [x] Add concurrency, recovery, and duplicate-processing tests.
 
-## 14. Anomaly Detection Engine
+## 14. Anomaly Detection Engine - Công cụ phát hiện bất thường
 
 - [ ] Define threshold policies by service, environment, metric, and severity.
-- [ ] Implement error-rate threshold detection with a default of greater than 5%.
-- [ ] Implement p95-latency detection with a default of greater than 2 seconds.
-- [ ] Implement memory detection with a default of greater than 85%.
-- [ ] Implement CPU detection with a default of greater than 80%.
-- [ ] Implement service `DOWN` detection.
-- [ ] Implement database-pool detection with a default of greater than 90%.
+- [x] Implement error-rate threshold detection with a default of greater than 5%.
+- [x] Implement p95-latency detection with a default of greater than 2 seconds.
+- [x] Implement memory detection with a default of greater than 85%.
+- [x] Implement CPU detection with a default of greater than 80%.
+- [x] Implement service `DOWN` detection.
+- [x] Implement database-pool detection with a default of greater than 90%.
 - [ ] Implement continuously increasing Kafka-lag detection.
 - [ ] Add evaluation windows, minimum sample sizes, hysteresis, and cooldowns.
 - [ ] Suppress duplicate and flapping alerts.
-- [ ] Persist anomaly outcomes and supporting signal references.
+- [x] Persist anomaly outcomes and supporting signal references.
 - [ ] Add boundary, trend, stale-data, and false-positive tests.
 
 ## 15. Correlation and Incident Management

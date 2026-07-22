@@ -36,6 +36,27 @@ CREATE INDEX idx_monitoring_signals_service_id ON monitoring_signals(service_id)
 CREATE INDEX idx_monitoring_signals_collected_at ON monitoring_signals(collected_at);
 CREATE INDEX idx_monitoring_signals_source_type ON monitoring_signals(source_type);
 
+CREATE TABLE anomaly_outcomes (
+    anomaly_id UUID PRIMARY KEY,
+    service_id UUID NOT NULL REFERENCES monitored_services(service_id) ON DELETE CASCADE,
+    signal_id UUID REFERENCES monitoring_signals(signal_id) ON DELETE SET NULL,
+    metric_name VARCHAR(200) NOT NULL,
+    threshold_value NUMERIC(19, 4),
+    observed_value NUMERIC(19, 4),
+    comparator VARCHAR(20) NOT NULL,
+    severity VARCHAR(50) NOT NULL,
+    outcome_status VARCHAR(50) NOT NULL,
+    evaluation_window_minutes INTEGER NOT NULL,
+    minimum_sample_size INTEGER NOT NULL,
+    detected_at TIMESTAMPTZ NOT NULL,
+    cooldown_until TIMESTAMPTZ,
+    supporting_references JSONB
+);
+
+CREATE INDEX idx_anomaly_outcomes_service_id ON anomaly_outcomes(service_id);
+CREATE INDEX idx_anomaly_outcomes_metric_name ON anomaly_outcomes(metric_name);
+CREATE INDEX idx_anomaly_outcomes_detected_at ON anomaly_outcomes(detected_at);
+
 CREATE TABLE incidents (
     incident_id UUID PRIMARY KEY,
     title VARCHAR(300) NOT NULL,
