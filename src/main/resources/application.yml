@@ -32,6 +32,18 @@ spring:
       - optional:configtree:/etc/monagent/secrets/
       - optional:configtree:/run/secrets/
 
+logging:
+  level:
+    root: INFO
+    com.monagent: INFO
+    org.springframework.security: WARN
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    org.flywaydb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
 management:
   endpoints:
     web:

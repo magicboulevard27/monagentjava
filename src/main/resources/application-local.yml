@@ -1,4 +1,10 @@
 spring:
+  profiles:
+    active: local
   datasource:
     url: ${MONAGENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monagent_local}
 
+logging:
+  level:
+    root: DEBUG
+    com.monagent: DEBUG
