@@ -17,7 +17,7 @@ import com.monagent.analysis.Recommendation;
 import com.monagent.analysis.RecommendationEngineService;
 import com.monagent.api.service.MonitoredServiceService;
 import com.monagent.collection.SignalNormalizationService;
-import com.monagent.collection.health.HealthSourceSignal;
+import com.monagent.collection.model.HealthSourceSignal;
 import com.monagent.collection.model.NormalizedSignal;
 import com.monagent.collection.model.SignalSeverity;
 import com.monagent.collection.model.SignalStatus;

@@ -1,10 +1,10 @@
 package com.monagent.ai;
 
-class StubIncidentAnalysisClient implements IncidentAnalysisClient {
+public class StubIncidentAnalysisClient implements IncidentAnalysisClient {
 
     private final String response;
 
-    StubIncidentAnalysisClient(String response) {
+    public StubIncidentAnalysisClient(String response) {
         this.response = response;
     }
 
