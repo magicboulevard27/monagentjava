@@ -69,8 +69,13 @@ monagent:
     file: ${MONAGENT_RELOAD_FILE:/etc/monagent/monagent-reload.properties}
   runtime:
     timezone: ${MONAGENT_TIMEZONE:UTC}
-    log-directory: ${MONAGENT_LOG_DIR:/var/log/monagent}
+    log-directory: ${MONAGENT_LOG_DIR:./logs}
     data-directory: ${MONAGENT_DATA_DIR:/var/lib/monagent}
+  retention:
+    monitoring-signals: ${MONAGENT_RETENTION_MONITORING_SIGNALS:P90D}
+    incident-evidence: ${MONAGENT_RETENTION_INCIDENT_EVIDENCE:P365D}
+    audit-logs: ${MONAGENT_RETENTION_AUDIT_LOGS:P365D}
+    archive-location: ${MONAGENT_ARCHIVE_LOCATION:/var/lib/monagent/archive}
   integrations:
     database:
       url: ${MONAGENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monagent}

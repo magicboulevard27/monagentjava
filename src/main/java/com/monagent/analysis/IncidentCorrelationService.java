@@ -141,6 +141,31 @@ public class IncidentCorrelationService {
         return merged;
     }
 
+    @Transactional
+    public IncidentCandidate updateIncidentState(UUID incidentId, IncidentLifecycleState nextState, Instant resolvedAt) {
+        IncidentEntity incident = incidentRepository.findById(incidentId)
+                .orElseThrow(() -> new IllegalArgumentException("Incident not found: " + incidentId));
+        incident.setStatus(nextState.name());
+        if (resolvedAt != null) {
+            incident.setResolvedAt(resolvedAt);
+        }
+        incidentRepository.saveAndFlush(incident);
+        log.info("Updated incident incidentId={} status={} resolvedAt={}", incidentId, nextState, resolvedAt);
+        return new IncidentCandidate(
+                incident.getIncidentId(),
+                incident.getTitle(),
+                incident.getSeverity(),
+                incident.getStatus(),
+                parseAffectedServices(incident.getAffectedServices()),
+                incident.getStartTime(),
+                incident.getDetectedAt(),
+                incident.getResolvedAt(),
+                incident.getLikelyRootCause(),
+                incident.getConfidence(),
+                incident.getSummary(),
+                List.of());
+    }
+
     public IncidentLifecycleState transition(IncidentLifecycleState currentState, boolean resolved, boolean suppressed) {
         if (suppressed) {
             return IncidentLifecycleState.SUPPRESSED;
@@ -225,5 +250,19 @@ public class IncidentCorrelationService {
 
     private String toJsonMap(AnomalyOutcome anomaly) {
         return "{\"metricName\":\"" + anomaly.metricName() + "\",\"severity\":\"" + anomaly.severity() + "\"}";
+    }
+
+    private List<String> parseAffectedServices(String json) {
+        if (json == null || json.isBlank() || "[]".equals(json.trim())) {
+            return List.of();
+        }
+        String trimmed = json.trim();
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            trimmed = trimmed.substring(1, trimmed.length() - 1);
+        }
+        if (trimmed.isBlank()) {
+            return List.of();
+        }
+        return List.of(trimmed.replace("\"", "").split("\\s*,\\s*"));
     }
 }

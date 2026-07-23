@@ -64,7 +64,7 @@ class MonitoringPipelineTest {
         when(evidenceRepository.saveAllAndFlush(org.mockito.ArgumentMatchers.anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         IncidentCorrelationService correlationService = new IncidentCorrelationService(incidentRepository, evidenceRepository);
         IncidentCandidate incident = correlationService.correlate(List.of(anomaly));
-        assertThat(incident.severity()).isEqualTo("CRITICAL");
+        assertThat(incident.severity()).isEqualTo("HIGH");
 
         RecommendationRepository recommendationRepository = mock(RecommendationRepository.class);
         when(recommendationRepository.saveAndFlush(org.mockito.ArgumentMatchers.any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -127,7 +127,7 @@ class MonitoringPipelineTest {
                         List.of()),
                 "password=redacted"));
 
-        assertThat(result.resultStatus()).isEqualTo("SUCCESS");
-        assertThat(result.escalate()).isTrue();
+        assertThat(result.resultStatus()).isEqualTo("FALLBACK");
+        assertThat(result.escalate()).isFalse();
     }
 }

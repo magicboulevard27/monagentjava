@@ -2,6 +2,7 @@ package com.monagent.analysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.monagent.persistence.RecommendationRepository;
@@ -47,7 +48,7 @@ class RecommendationEngineServiceTest {
         assertThat(recommendations).isNotEmpty();
         assertThat(recommendations).extracting(Recommendation::actionType)
                 .contains(RecommendationActionType.RESTART_SERVICE, RecommendationActionType.SCALE_UP, RecommendationActionType.ADJUST_RESOURCE_LIMITS);
-        verify(repository).saveAndFlush(org.mockito.ArgumentMatchers.any());
+        verify(repository, times(4)).saveAndFlush(org.mockito.ArgumentMatchers.any());
     }
 
     @Test
