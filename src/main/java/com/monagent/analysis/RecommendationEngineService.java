@@ -26,6 +26,7 @@ public class RecommendationEngineService {
     public List<Recommendation> generate(IncidentCandidate incident, List<IncidentEvidence> evidence) {
         List<Recommendation> recommendations = new ArrayList<>();
         if (incident == null) {
+            log.warn("Skipping recommendation generation because incident was null");
             return recommendations;
         }
 
@@ -34,6 +35,7 @@ public class RecommendationEngineService {
         List<String> evidenceIds = evidence == null ? List.of() : evidence.stream().map(item -> item.evidenceId().toString()).toList();
 
         if (!hasEvidence) {
+            log.info("Generating fallback no-op recommendation incidentId={}", incident.incidentId());
             recommendations.add(persist(new Recommendation(
                     UUID.randomUUID(),
                     incident.incidentId(),
@@ -48,9 +50,11 @@ public class RecommendationEngineService {
             return recommendations;
         }
 
+        log.info("Generating recommendations incidentId={} evidenceCount={}", incident.incidentId(), evidence.size());
         for (Recommendation recommendation : mapRecommendations(incident, evidenceSummary, evidenceIds)) {
             recommendations.add(persist(recommendation));
         }
+        log.info("Generated {} recommendations incidentId={}", recommendations.size(), incident.incidentId());
         return recommendations;
     }
 

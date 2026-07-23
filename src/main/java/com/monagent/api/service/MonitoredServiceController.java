@@ -31,16 +31,19 @@ public class MonitoredServiceController {
 
     @GetMapping
     public List<MonitoredServiceResponse> list() {
+        log.info("Listing monitored services");
         return service.list().stream().map(MonitoredServiceMapper::toResponse).toList();
     }
 
     @GetMapping("/{serviceId}")
     public MonitoredServiceResponse get(@PathVariable UUID serviceId) {
+        log.info("Fetching monitored service serviceId={}", serviceId);
         return MonitoredServiceMapper.toResponse(service.get(serviceId));
     }
 
     @PostMapping
     public ResponseEntity<MonitoredServiceResponse> create(@Valid @RequestBody MonitoredServiceRequest request) {
+        log.info("Creating monitored service serviceName={} environment={}", request.serviceName(), request.environment());
         MonitoredService created = service.create(request);
         return ResponseEntity.created(URI.create("/api/v1/services/" + created.serviceId()))
                 .body(MonitoredServiceMapper.toResponse(created));
@@ -48,11 +51,13 @@ public class MonitoredServiceController {
 
     @PutMapping("/{serviceId}")
     public MonitoredServiceResponse update(@PathVariable UUID serviceId, @Valid @RequestBody MonitoredServiceRequest request) {
+        log.info("Updating monitored service serviceId={} serviceName={} environment={}", serviceId, request.serviceName(), request.environment());
         return MonitoredServiceMapper.toResponse(service.update(serviceId, request));
     }
 
     @DeleteMapping("/{serviceId}")
     public ResponseEntity<Void> delete(@PathVariable UUID serviceId) {
+        log.info("Deleting monitored service serviceId={}", serviceId);
         service.delete(serviceId);
         return ResponseEntity.noContent().build();
     }

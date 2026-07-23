@@ -48,36 +48,44 @@ public class IncidentController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Integer limit,
             @RequestParam(required = false) Integer offset) {
+        log.info("Listing incidents severity={} status={} limit={} offset={}", severity, status, limit, offset);
         return incidentQueryService.list(severity, status, limit, offset);
     }
 
     @PostMapping("/incidents/analyze")
     public IncidentAnalysisResult analyze(@Valid @RequestBody IncidentAnalyzeRequest request) {
+        log.info("Analyzing incident request with {} anomalies", request.anomalies().size());
         IncidentCandidate candidate = incidentCorrelationService.correlate(request.anomalies());
         List<IncidentEvidence> evidence = candidate.evidence();
         List<Recommendation> recommendations = recommendationEngineService.generate(candidate, evidence);
         auditService.record("system", "INCIDENT_ANALYZED", "incident", candidate.incidentId(), candidate.summary());
+        log.info("Incident analysis completed incidentId={} evidenceCount={} recommendationCount={}",
+                candidate.incidentId(), evidence.size(), recommendations.size());
         return new IncidentAnalysisResult(candidate, recommendations);
     }
 
     @GetMapping("/incidents/{incidentId}")
     public IncidentResponse get(@PathVariable UUID incidentId) {
+        log.info("Fetching incident incidentId={}", incidentId);
         return incidentQueryService.get(incidentId);
     }
 
     @GetMapping("/incidents/{incidentId}/evidence")
     public List<IncidentEvidenceQueryResponse> evidence(@PathVariable UUID incidentId) {
+        log.info("Fetching incident evidence incidentId={}", incidentId);
         return incidentQueryService.evidence(incidentId);
     }
 
     @GetMapping("/incidents/{incidentId}/recommendations")
     public List<RecommendationSummaryResponse> recommendations(@PathVariable UUID incidentId) {
+        log.info("Fetching incident recommendations incidentId={}", incidentId);
         return incidentQueryService.recommendations(incidentId);
     }
 
     @GetMapping("/reports/incidents/{incidentId}")
     public IncidentReportResponse report(@PathVariable UUID incidentId,
                                          @RequestParam(defaultValue = "markdown") String format) {
+        log.info("Fetching incident report incidentId={} format={}", incidentId, format);
         if ("json".equalsIgnoreCase(format)) {
             return incidentQueryService.reportJson(incidentId);
         }

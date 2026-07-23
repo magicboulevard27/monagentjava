@@ -44,10 +44,11 @@ public class LogAnalyzerService {
 
     @Scheduled(fixedDelayString = "${monagent.collectors.logs.interval-seconds:60}000")
     public void analyze() {
-        // Collection scheduling is wired; service-targeted orchestration comes later.
+        log.debug("Scheduled log analysis tick started");
     }
 
     public NormalizedSignal analyze(MonitoredService service, String severity) {
+        log.info("Analyzing logs serviceName={} environment={} severity={}", service.serviceName(), service.environment(), severity);
         Map<String, Object> response = client.query(properties.endpoint(), service.serviceName(), service.environment(), severity, properties.timeout());
         String message = redactedSummary(response);
         String pattern = detector.detect(message);
@@ -61,6 +62,7 @@ public class LogAnalyzerService {
                 stringify(response));
         NormalizedSignal normalized = normalizationService.fromLog(source);
         persistEvidence(service, normalized, pattern, message);
+        log.info("Log analysis completed serviceName={} pattern={} signalId={}", service.serviceName(), pattern, normalized.signalId());
         return normalized;
     }
 
@@ -76,6 +78,7 @@ public class LogAnalyzerService {
         entity.setReferenceId(signal.rawReference());
         entity.setRedactedPayload(message);
         incidentEvidenceRepository.saveAndFlush(entity);
+        log.debug("Persisted log evidence serviceName={} signalId={} pattern={}", service.serviceName(), signal.signalId(), pattern);
     }
 
     private String redactedSummary(Map<String, Object> response) {

@@ -40,6 +40,7 @@ public class IncidentCorrelationService {
             throw new IllegalArgumentException("At least one anomaly outcome is required");
         }
 
+        log.info("Correlating {} anomaly outcomes into an incident", anomalies.size());
         List<AnomalyOutcome> sorted = anomalies.stream()
                 .sorted(Comparator.comparing(AnomalyOutcome::detectedAt))
                 .toList();
@@ -79,6 +80,7 @@ public class IncidentCorrelationService {
         incident.setConfidence(confidence);
         incident.setSummary(summary);
         incidentRepository.saveAndFlush(incident);
+        log.info("Created incident incidentId={} severity={} affectedServices={}", incidentId, severity, affectedServices.size());
 
         List<IncidentEvidenceEntity> evidenceEntities = new ArrayList<>();
         for (AnomalyOutcome anomaly : sorted) {
@@ -95,6 +97,7 @@ public class IncidentCorrelationService {
             evidenceEntities.add(evidence);
         }
         incidentEvidenceRepository.saveAllAndFlush(evidenceEntities);
+        log.debug("Persisted {} incident evidence records incidentId={}", evidenceEntities.size(), incidentId);
 
         List<IncidentEvidence> evidence = evidenceEntities.stream()
                 .map(entity -> new IncidentEvidence(
@@ -126,6 +129,7 @@ public class IncidentCorrelationService {
 
     @Transactional
     public List<IncidentCandidate> mergeDuplicateCandidates(List<IncidentCandidate> candidates) {
+        log.info("Merging {} incident candidates", candidates == null ? 0 : candidates.size());
         Map<String, List<IncidentCandidate>> grouped = candidates.stream()
                 .collect(Collectors.groupingBy(this::deduplicationKey, LinkedHashMap::new, Collectors.toList()));
 
@@ -133,6 +137,7 @@ public class IncidentCorrelationService {
         for (List<IncidentCandidate> group : grouped.values()) {
             merged.add(mergeGroup(group));
         }
+        log.info("Merged {} candidate groups into {} candidates", grouped.size(), merged.size());
         return merged;
     }
 

@@ -39,6 +39,7 @@ public class ApprovalController {
             @PathVariable UUID recommendationId,
             @Valid @RequestBody ApprovalDecisionRequest request,
             @RequestHeader(name = "X-Actor-Role", defaultValue = "APPROVER") ApprovalRole role) {
+        log.info("Approving recommendationId={} actor={} role={}", recommendationId, request.actor(), role);
         if (!approvalPolicy.canDecide(role)) {
             throw new IllegalArgumentException("Actor is not authorized to approve recommendations");
         }
@@ -50,6 +51,7 @@ public class ApprovalController {
             @PathVariable UUID recommendationId,
             @Valid @RequestBody ApprovalDecisionRequest request,
             @RequestHeader(name = "X-Actor-Role", defaultValue = "APPROVER") ApprovalRole role) {
+        log.info("Rejecting recommendationId={} actor={} role={}", recommendationId, request.actor(), role);
         if (!approvalPolicy.canDecide(role)) {
             throw new IllegalArgumentException("Actor is not authorized to reject recommendations");
         }
@@ -58,6 +60,7 @@ public class ApprovalController {
 
     @GetMapping("/approvals")
     public List<ApprovalResponse> list() {
+        log.info("Listing approvals");
         return approvalService.list();
     }
 
@@ -66,6 +69,7 @@ public class ApprovalController {
             @PathVariable UUID recommendationId,
             @Valid @RequestBody ApprovalDecisionRequest request,
             @RequestHeader(name = "X-Actor-Role", defaultValue = "OPERATOR") ApprovalRole role) {
+        log.info("Requesting approval recommendationId={} actor={} role={}", recommendationId, request.actor(), role);
         if (!approvalPolicy.canRequest(role, RecommendationActionType.RESTART_SERVICE)) {
             throw new IllegalArgumentException("Actor is not authorized to request approvals");
         }

@@ -35,6 +35,7 @@ public class ApprovalService {
 
     @Transactional
     public ApprovalResponse request(UUID recommendationId, String actor, String reason) {
+        log.info("Creating approval request recommendationId={} actor={}", recommendationId, actor);
         RecommendationEntity recommendation = recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> new EntityNotFoundException("Recommendation not found: " + recommendationId));
         ensureAppropriateAction(recommendation);
@@ -50,11 +51,13 @@ public class ApprovalService {
         approvalRepository.saveAndFlush(approval);
         auditService.record(actor, "APPROVAL_REQUESTED", "recommendation", recommendationId, sanitize(reason));
         metrics.incrementApprovalDecision(ApprovalStatus.REQUESTED.name());
+        log.info("Approval requested approvalId={} recommendationId={}", approval.getApprovalId(), recommendationId);
         return toResponse(approval);
     }
 
     @Transactional
     public ApprovalResponse approve(UUID recommendationId, String actor, String reason) {
+        log.info("Approving recommendationId={} actor={}", recommendationId, actor);
         ApprovalEntity approval = loadOpenApproval(recommendationId);
         if (actor.equalsIgnoreCase(approval.getRequestedBy())) {
             throw new IllegalArgumentException("Self-approval is not allowed");
@@ -66,11 +69,13 @@ public class ApprovalService {
         approvalRepository.saveAndFlush(approval);
         auditService.record(actor, "APPROVAL_APPROVED", "recommendation", recommendationId, sanitize(reason));
         metrics.incrementApprovalDecision(ApprovalStatus.APPROVED.name());
+        log.info("Approval approved approvalId={} recommendationId={}", approval.getApprovalId(), recommendationId);
         return toResponse(approval);
     }
 
     @Transactional
     public ApprovalResponse reject(UUID recommendationId, String actor, String reason) {
+        log.info("Rejecting recommendationId={} actor={}", recommendationId, actor);
         ApprovalEntity approval = loadOpenApproval(recommendationId);
         approval.setApprovedBy(actor);
         approval.setApprovalStatus(ApprovalStatus.REJECTED.name());
@@ -79,11 +84,13 @@ public class ApprovalService {
         approvalRepository.saveAndFlush(approval);
         auditService.record(actor, "APPROVAL_REJECTED", "recommendation", recommendationId, sanitize(reason));
         metrics.incrementApprovalDecision(ApprovalStatus.REJECTED.name());
+        log.info("Approval rejected approvalId={} recommendationId={}", approval.getApprovalId(), recommendationId);
         return toResponse(approval);
     }
 
     @Transactional(readOnly = true)
     public List<ApprovalResponse> list() {
+        log.debug("Loading approvals");
         return approvalRepository.findAll().stream().map(this::toResponse).toList();
     }
 
