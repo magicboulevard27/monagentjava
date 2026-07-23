@@ -1,11 +1,41 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_HOME="${APP_HOME:-/opt/monagent}"
-JAVA_BIN="${JAVA_BIN:-java}"
-JAR_FILE="${JAR_FILE:-$APP_HOME/app/monagentjava.jar}"
-JAVA_OPTS="${JAVA_OPTS:--XX:+UseG1GC -XX:MaxRAMPercentage=75.0 -Duser.timezone=UTC}"
-PROFILE="${SPRING_PROFILES_ACTIVE:-production}"
+usage() {
+    cat <<'EOF'
+Usage: start-linux.sh [minimal|observability|ai|full]
 
-exec "$JAVA_BIN" $JAVA_OPTS -jar "$JAR_FILE" --spring.profiles.active="$PROFILE"
+Modes:
+  minimal         Build the app and start the base stack
+  observability   Start the base stack with observability services
+  ai              Start the base stack with Ollama
+  full            Start observability and Ollama together
+EOF
+}
+
+mode="${1:-minimal}"
+
+case "$mode" in
+    -h|--help|help)
+        usage
+        exit 0
+        ;;
+    minimal)
+        docker compose up --build
+        ;;
+    observability)
+        docker compose --profile observability up --build
+        ;;
+    ai)
+        docker compose --profile ai up --build
+        ;;
+    full)
+        docker compose --profile observability --profile ai up --build
+        ;;
+    *)
+        echo "Unknown mode: $mode" >&2
+        usage >&2
+        exit 1
+        ;;
+esac
 

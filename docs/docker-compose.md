@@ -5,7 +5,7 @@
 - `postgres`: PostgreSQL for application data.
 - `monagent`: the Spring Boot application.
 - `prometheus`: optional metrics backend, enabled with the `observability` profile.
-- `opensearch`: optional log backend, enabled with the `observability` profile.
+- `opensearch`: optional log backend, enabled with the `observability` profile. It requires `OPENSEARCH_INITIAL_ADMIN_PASSWORD` for local startup; the Compose file now defaults this to `admin123!`.
 - `jaeger`: optional tracing backend, enabled with the `observability` profile.
 - `ollama`: optional local LLM backend, enabled with the `ai` profile.
 

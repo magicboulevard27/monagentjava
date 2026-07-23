@@ -1,12 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PID_FILE="${PID_FILE:-/run/monagent/monagent.pid}"
+usage() {
+    cat <<'EOF'
+Usage: stop-linux.sh [minimal|observability|ai|full]
 
-if [[ ! -f "$PID_FILE" ]]; then
-    echo "PID file not found: $PID_FILE" >&2
-    exit 1
-fi
+Modes:
+  minimal         Stop the base stack
+  observability   Stop the base stack and observability services
+  ai              Stop the base stack and Ollama
+  full            Stop the full stack
+EOF
+}
 
-kill -TERM "$(cat "$PID_FILE")"
+mode="${1:-minimal}"
+
+case "$mode" in
+    -h|--help|help)
+        usage
+        exit 0
+        ;;
+    minimal|observability|ai|full)
+        docker compose down
+        ;;
+    *)
+        echo "Unknown mode: $mode" >&2
+        usage >&2
+        exit 1
+        ;;
+esac
 

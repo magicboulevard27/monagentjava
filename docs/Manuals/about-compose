@@ -1,0 +1,175 @@
+Use these three startup sequences.
+
+1. Minimal local dev
+```powershell
+mvn clean package
+docker compose up --build
+```
+
+2. Full stack with observability
+```powershell
+mvn clean package
+docker compose --profile observability up --build
+```
+
+3. Full stack with observability + Ollama
+```powershell
+mvn clean package
+docker compose --profile observability --profile ai up --build
+```
+
+Order matters:
+- build the JAR first
+- then start Compose
+- then add the profiles you want
+
+If you want, I can also give you the exact shutdown commands for each case.
+
+Shutdown commands for the same three cases:
+
+1. Minimal local dev
+```powershell
+docker compose down
+```
+
+2. Full stack with observability
+```powershell
+docker compose --profile observability down
+```
+
+3. Full stack with observability + Ollama
+```powershell
+docker compose --profile observability --profile ai down
+```
+
+If you also want to wipe the persistent data volumes for a clean reset:
+```powershell
+docker compose down -v
+```
+
+Use these in Linux Bash.
+
+**Start**
+```bash
+mvn clean package
+docker compose up --build
+```
+
+**Start full observability**
+```bash
+mvn clean package
+docker compose --profile observability up --build
+```
+
+**Start observability + Ollama**
+```bash
+mvn clean package
+docker compose --profile observability --profile ai up --build
+```
+
+**Stop**
+```bash
+docker compose down
+```
+
+**Stop full observability**
+```bash
+docker compose --profile observability down
+```
+
+**Stop observability + Ollama**
+```bash
+docker compose --profile observability --profile ai down
+```
+
+**Clean reset**
+```bash
+docker compose down -v
+```
+
+If you want, I can also turn this into a `start.sh` / `stop.sh` / `reset.sh` set.
+
+Added a Linux Bash reset script:
+
+- [`scripts/reset-linux.sh`](/Z:/_Dev/AI-agents/monagentjava/scripts/reset-linux.sh)
+
+It runs:
+```bash
+docker compose down -v
+```
+
+The repo already had:
+- [`scripts/start-linux.sh`](/Z:/_Dev/AI-agents/monagentjava/scripts/start-linux.sh)
+- [`scripts/stop-linux.sh`](/Z:/_Dev/AI-agents/monagentjava/scripts/stop-linux.sh)
+
+If you want, I can also add a single `scripts/start-linux.sh` variant that supports `minimal`, `observability`, and `ai` modes from one script.
+
+Updated [`scripts/start-linux.sh`](/Z:/_Dev/AI-agents/monagentjava/scripts/start-linux.sh) so you can start the stack with one script:
+
+```bash
+./scripts/start-linux.sh minimal
+./scripts/start-linux.sh observability
+./scripts/start-linux.sh ai
+./scripts/start-linux.sh full
+```
+
+What each mode does:
+- `minimal` -> `docker compose up --build`
+- `observability` -> `docker compose --profile observability up --build`
+- `ai` -> `docker compose --profile ai up --build`
+- `full` -> `docker compose --profile observability --profile ai up --build`
+
+I also kept `-h`, `--help`, and `help` support.
+
+If you want, I can make the stop script match this style too, so you can run `./scripts/stop-linux.sh full` and `./scripts/reset-linux.sh`.
+
+Updated both scripts to match the same mode names:
+
+- [`scripts/stop-linux.sh`](/Z:/_Dev/AI-agents/monagentjava/scripts/stop-linux.sh)
+- [`scripts/reset-linux.sh`](/Z:/_Dev/AI-agents/monagentjava/scripts/reset-linux.sh)
+
+Now you can use:
+
+```bash
+./scripts/stop-linux.sh minimal
+./scripts/stop-linux.sh observability
+./scripts/stop-linux.sh ai
+./scripts/stop-linux.sh full
+```
+
+and:
+
+```bash
+./scripts/reset-linux.sh minimal
+./scripts/reset-linux.sh observability
+./scripts/reset-linux.sh ai
+./scripts/reset-linux.sh full
+```
+
+They currently map to:
+- `stop` -> `docker compose down`
+- `reset` -> `docker compose down -v`
+
+If you want, I can make these scripts also accept an explicit compose command path like `COMPOSE="docker compose"` or add a single `stack.sh` entrypoint that handles `start|stop|reset`.
+
+Fixed in Compose.
+
+What changed:
+- Added `OPENSEARCH_INITIAL_ADMIN_PASSWORD` to the OpenSearch service in [`docker-compose.yml`](/Z:/_Dev/AI-agents/monagentjava/docker-compose.yml)
+- Documented the requirement in [`docs/docker-compose.md`](/Z:/_Dev/AI-agents/monagentjava/docs/docker-compose.md)
+
+Default local value:
+```yaml
+OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-admin123!}
+```
+
+That should stop the container from exiting with:
+- `No custom admin password found`
+
+If you want to use your own password instead of the default, set it before starting:
+```bash
+export OPENSEARCH_INITIAL_ADMIN_PASSWORD='your-strong-password'
+docker compose --profile observability up --build
+```
+
+If you want, I can also add this variable to a `.env.example` or make the startup scripts set it automatically.
