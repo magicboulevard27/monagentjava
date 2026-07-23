@@ -58,7 +58,7 @@ public class AnomalyOutcomeEntity {
     @Column(name = "supporting_references", columnDefinition = "jsonb")
     private String supportingReferences;
 
-    protected AnomalyOutcomeEntity() {
+    public AnomalyOutcomeEntity() {
     }
 
     public UUID getAnomalyId() {
