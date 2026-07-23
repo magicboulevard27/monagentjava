@@ -13,11 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class IncidentCorrelationService {
+
+    private static final Logger log = LoggerFactory.getLogger(IncidentCorrelationService.class);
 
     private static final Duration DEFAULT_CORRELATION_WINDOW = Duration.ofMinutes(30);
 
@@ -36,6 +40,7 @@ public class IncidentCorrelationService {
             throw new IllegalArgumentException("At least one anomaly outcome is required");
         }
 
+        log.info("Correlating {} anomaly outcomes into an incident", anomalies.size());
         List<AnomalyOutcome> sorted = anomalies.stream()
                 .sorted(Comparator.comparing(AnomalyOutcome::detectedAt))
                 .toList();
@@ -75,6 +80,7 @@ public class IncidentCorrelationService {
         incident.setConfidence(confidence);
         incident.setSummary(summary);
         incidentRepository.saveAndFlush(incident);
+        log.info("Created incident incidentId={} severity={} affectedServices={}", incidentId, severity, affectedServices.size());
 
         List<IncidentEvidenceEntity> evidenceEntities = new ArrayList<>();
         for (AnomalyOutcome anomaly : sorted) {
@@ -91,6 +97,7 @@ public class IncidentCorrelationService {
             evidenceEntities.add(evidence);
         }
         incidentEvidenceRepository.saveAllAndFlush(evidenceEntities);
+        log.debug("Persisted {} incident evidence records incidentId={}", evidenceEntities.size(), incidentId);
 
         List<IncidentEvidence> evidence = evidenceEntities.stream()
                 .map(entity -> new IncidentEvidence(
@@ -122,6 +129,7 @@ public class IncidentCorrelationService {
 
     @Transactional
     public List<IncidentCandidate> mergeDuplicateCandidates(List<IncidentCandidate> candidates) {
+        log.info("Merging {} incident candidates", candidates == null ? 0 : candidates.size());
         Map<String, List<IncidentCandidate>> grouped = candidates.stream()
                 .collect(Collectors.groupingBy(this::deduplicationKey, LinkedHashMap::new, Collectors.toList()));
 
@@ -129,7 +137,33 @@ public class IncidentCorrelationService {
         for (List<IncidentCandidate> group : grouped.values()) {
             merged.add(mergeGroup(group));
         }
+        log.info("Merged {} candidate groups into {} candidates", grouped.size(), merged.size());
         return merged;
+    }
+
+    @Transactional
+    public IncidentCandidate updateIncidentState(UUID incidentId, IncidentLifecycleState nextState, Instant resolvedAt) {
+        IncidentEntity incident = incidentRepository.findById(incidentId)
+                .orElseThrow(() -> new IllegalArgumentException("Incident not found: " + incidentId));
+        incident.setStatus(nextState.name());
+        if (resolvedAt != null) {
+            incident.setResolvedAt(resolvedAt);
+        }
+        incidentRepository.saveAndFlush(incident);
+        log.info("Updated incident incidentId={} status={} resolvedAt={}", incidentId, nextState, resolvedAt);
+        return new IncidentCandidate(
+                incident.getIncidentId(),
+                incident.getTitle(),
+                incident.getSeverity(),
+                incident.getStatus(),
+                parseAffectedServices(incident.getAffectedServices()),
+                incident.getStartTime(),
+                incident.getDetectedAt(),
+                incident.getResolvedAt(),
+                incident.getLikelyRootCause(),
+                incident.getConfidence(),
+                incident.getSummary(),
+                List.of());
     }
 
     public IncidentLifecycleState transition(IncidentLifecycleState currentState, boolean resolved, boolean suppressed) {
@@ -216,5 +250,19 @@ public class IncidentCorrelationService {
 
     private String toJsonMap(AnomalyOutcome anomaly) {
         return "{\"metricName\":\"" + anomaly.metricName() + "\",\"severity\":\"" + anomaly.severity() + "\"}";
+    }
+
+    private List<String> parseAffectedServices(String json) {
+        if (json == null || json.isBlank() || "[]".equals(json.trim())) {
+            return List.of();
+        }
+        String trimmed = json.trim();
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            trimmed = trimmed.substring(1, trimmed.length() - 1);
+        }
+        if (trimmed.isBlank()) {
+            return List.of();
+        }
+        return List.of(trimmed.replace("\"", "").split("\\s*,\\s*"));
     }
 }

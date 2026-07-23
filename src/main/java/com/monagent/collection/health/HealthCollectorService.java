@@ -13,11 +13,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 public class HealthCollectorService {
+
+    private static final Logger log = LoggerFactory.getLogger(HealthCollectorService.class);
 
     private final MonitoredServiceService monitoredServiceService;
     private final HealthCollectorClient client;

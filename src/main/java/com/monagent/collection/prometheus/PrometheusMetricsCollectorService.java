@@ -7,11 +7,15 @@ import com.monagent.collection.model.NormalizedSignal;
 import com.monagent.domain.MonitoredService;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PrometheusMetricsCollectorService {
+
+    private static final Logger log = LoggerFactory.getLogger(PrometheusMetricsCollectorService.class);
 
     private static final String PROMETHEUS_API = "/api/v1/query";
 

@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      LOGGING_LEVEL_ROOT: ${LOGGING_LEVEL_ROOT:-INFO}
       MONAGENT_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-monagent}
       MONAGENT_DATASOURCE_USERNAME: ${POSTGRES_USER:-monagent}
       MONAGENT_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-monagent}

@@ -10,11 +10,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LogAnalyzerService {
+
+    private static final Logger log = LoggerFactory.getLogger(LogAnalyzerService.class);
 
     private final LogAnalyzerProperties properties;
     private final LogSearchClient client;
@@ -40,10 +44,11 @@ public class LogAnalyzerService {
 
     @Scheduled(fixedDelayString = "${monagent.collectors.logs.interval-seconds:60}000")
     public void analyze() {
-        // Collection scheduling is wired; service-targeted orchestration comes later.
+        log.debug("Scheduled log analysis tick started");
     }
 
     public NormalizedSignal analyze(MonitoredService service, String severity) {
+        log.info("Analyzing logs serviceName={} environment={} severity={}", service.serviceName(), service.environment(), severity);
         Map<String, Object> response = client.query(properties.endpoint(), service.serviceName(), service.environment(), severity, properties.timeout());
         String message = redactedSummary(response);
         String pattern = detector.detect(message);
@@ -57,6 +62,7 @@ public class LogAnalyzerService {
                 stringify(response));
         NormalizedSignal normalized = normalizationService.fromLog(source);
         persistEvidence(service, normalized, pattern, message);
+        log.info("Log analysis completed serviceName={} pattern={} signalId={}", service.serviceName(), pattern, normalized.signalId());
         return normalized;
     }
 
@@ -72,6 +78,7 @@ public class LogAnalyzerService {
         entity.setReferenceId(signal.rawReference());
         entity.setRedactedPayload(message);
         incidentEvidenceRepository.saveAndFlush(entity);
+        log.debug("Persisted log evidence serviceName={} signalId={} pattern={}", service.serviceName(), signal.signalId(), pattern);
     }
 
     private String redactedSummary(Map<String, Object> response) {

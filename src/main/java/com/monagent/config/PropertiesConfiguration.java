@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Configuration;
         MonitoringProperties.class,
         RuntimeProperties.class,
         IntegrationProperties.class,
-        ReloadableConfigurationProperties.class
+        ReloadableConfigurationProperties.class,
+        RetentionProperties.class
 })
 public class PropertiesConfiguration {
 }

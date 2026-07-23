@@ -81,10 +81,10 @@
 - [x] Add indexes for service, environment, severity, status, and timestamp queries.
 - [x] Define JSON/JSONB columns for structured event payloads where appropriate.
 - [x] Implement JPA entities and repository interfaces.
-- [ ] Implement transaction boundaries for incident creation and updates.
-- [x] Implement optimistic locking for approvals and incident state changes.
-- [ ] Define retention and archival policies for signals, evidence, and audit records.
-- [x] Add PostgreSQL integration tests using Testcontainers.
+  - [x] Implement transaction boundaries for incident creation and updates.
+  - [x] Implement optimistic locking for approvals and incident state changes.
+  - [x] Define retention and archival policies for signals, evidence, and audit records.
+  - [x] Add PostgreSQL integration tests using Testcontainers.
 
 ## 6. Service Registry
 
@@ -498,8 +498,8 @@
 
 | Phase | Owner | Target Date | Status | Evidence / Notes |
 | --- | --- | --- | --- | --- |
-| Phase 1 — Basic Monitoring Agent | TBD | TBD | Not started | |
-| Phase 2 — Log and Trace Correlation | TBD | TBD | Not started | |
-| Phase 3 — AI Reasoning Layer | TBD | TBD | Not started | |
-| Phase 4 — Incident Automation | TBD | TBD | Not started | |
-| Phase 5 — Advanced Remediation | TBD | TBD | Not started | |
+| Phase 1 — Basic Monitoring Agent | TBD | TBD | In progress | Core registry, health collection, Prometheus metrics, and threshold detection are implemented; Linux/Compose verification still pending. |
+| Phase 2 — Log and Trace Correlation | TBD | TBD | In progress | Log redaction, trace analysis, incident evidence persistence, and correlation are implemented; OpenSearch/Jaeger operational verification still pending. |
+| Phase 3 — AI Reasoning Layer | TBD | TBD | In progress | Ollama client, structured output parsing, fallback analysis, and prompt grounding are implemented; evaluation and outage tests still pending. |
+| Phase 4 — Incident Automation | TBD | TBD | In progress | Notifications, approvals, and audit plumbing are implemented; production-safe execution and full audit verification still pending. |
+| Phase 5 — Advanced Remediation | TBD | TBD | Not started | Kubernetes read-only inspection and approved execution remain future work. |
