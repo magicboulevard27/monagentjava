@@ -9,11 +9,15 @@ import com.monagent.persistence.IncidentEvidenceRepository;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TraceAnalyzerService {
+
+    private static final Logger log = LoggerFactory.getLogger(TraceAnalyzerService.class);
 
     private final TraceAnalyzerProperties properties;
     private final TraceSearchClient client;

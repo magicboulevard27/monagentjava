@@ -12,10 +12,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IncidentQueryService {
+
+    private static final Logger log = LoggerFactory.getLogger(IncidentQueryService.class);
 
     private final IncidentRepository incidentRepository;
     private final IncidentEvidenceRepository incidentEvidenceRepository;

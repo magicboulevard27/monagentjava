@@ -11,10 +11,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IncidentAnalysisService {
+
+    private static final Logger log = LoggerFactory.getLogger(IncidentAnalysisService.class);
 
     private final IncidentAnalysisClient client;
     private final IncidentAnalysisPromptBuilder promptBuilder;
