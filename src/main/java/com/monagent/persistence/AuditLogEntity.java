@@ -36,7 +36,7 @@ public class AuditLogEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected AuditLogEntity() {
+    public AuditLogEntity() {
     }
 
     public UUID getAuditId() {

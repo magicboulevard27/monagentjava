@@ -45,7 +45,7 @@ public class MonitoringSignalEntity {
     @Column(name = "raw_reference", columnDefinition = "jsonb")
     private String rawReference;
 
-    protected MonitoringSignalEntity() {
+    public MonitoringSignalEntity() {
     }
 
     public UUID getSignalId() {

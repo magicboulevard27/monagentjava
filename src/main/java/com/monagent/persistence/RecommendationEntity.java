@@ -39,7 +39,7 @@ public class RecommendationEntity {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    protected RecommendationEntity() {
+    public RecommendationEntity() {
     }
 
     public UUID getRecommendationId() {

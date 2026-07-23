@@ -38,7 +38,7 @@ public class ApprovalEntity {
     @Column(name = "version", nullable = false)
     private long version;
 
-    protected ApprovalEntity() {
+    public ApprovalEntity() {
     }
 
     public UUID getApprovalId() {

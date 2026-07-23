@@ -48,7 +48,7 @@ public class IncidentEntity {
     @Column(name = "summary")
     private String summary;
 
-    protected IncidentEntity() {
+    public IncidentEntity() {
     }
 
     public UUID getIncidentId() {

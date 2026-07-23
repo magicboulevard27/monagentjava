@@ -42,7 +42,7 @@ public class IncidentEvidenceEntity {
     @Column(name = "redacted_payload", columnDefinition = "jsonb")
     private String redactedPayload;
 
-    protected IncidentEvidenceEntity() {
+    public IncidentEvidenceEntity() {
     }
 
     public UUID getEvidenceId() {
