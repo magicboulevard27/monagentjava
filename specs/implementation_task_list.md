@@ -259,12 +259,12 @@
 - [x] Implement the selected MVP notification channel(s).
 - [x] Add Slack integration if selected.
 - [x] Add email integration if selected.
-- [ ] Add Microsoft Teams integration if selected.
-- [ ] Add Jira ticket creation if selected.
-- [ ] Add PagerDuty or Opsgenie integration if selected.
+- [x] Add Microsoft Teams integration if selected.
+- [x] Add Jira ticket creation if selected.
+- [x] Add PagerDuty or Opsgenie integration if selected.
 - [x] Include incident ID, severity, services, symptoms, root cause, confidence, evidence, and next steps.
 - [x] Implement channel-specific templates and Markdown-safe rendering.
-- [ ] Add delivery retries, exponential backoff, deduplication, and failure auditing.
+- [x] Add delivery retries, exponential backoff, deduplication, and failure auditing.
 - [x] Prevent secrets and unredacted evidence from entering notifications.
 - [x] Add integration contract tests using mock endpoints.
 
@@ -293,7 +293,7 @@
 - [x] Implement `GET /api/v1/incidents/{incidentId}/recommendations`.
 - [x] Implement `GET /api/v1/reports/incidents/{incidentId}`.
 - [x] Implement Markdown and JSON report endpoints.
-- [ ] Add Jakarta Bean Validation and consistent error responses.
+- [x] Add Jakarta Bean Validation and consistent error responses.
 - [ ] Add API pagination, sorting, filtering, and request limits.
 - [ ] Generate and maintain an OpenAPI specification.
 - [x] Add controller, validation, security, and contract tests.

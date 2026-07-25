@@ -7,12 +7,14 @@ import com.monagent.analysis.IncidentEvidence;
 import com.monagent.analysis.Recommendation;
 import com.monagent.analysis.RecommendationActionType;
 import com.monagent.analysis.RecommendationRiskLevel;
+import com.monagent.audit.AuditService;
 import com.monagent.web.SelfObservabilityMetrics;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
 
 class NotificationDispatcherTest {
 
@@ -22,7 +24,8 @@ class NotificationDispatcherTest {
         NotificationDispatcher dispatcher = new NotificationDispatcher(
                 List.of(new SlackNotificationChannel(renderer), new EmailNotificationChannel(renderer, notificationProperties())),
                 renderer,
-                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
+                mock(AuditService.class));
 
         IncidentCandidate incident = new IncidentCandidate(
                 UUID.randomUUID(),
@@ -63,7 +66,8 @@ class NotificationDispatcherTest {
         NotificationDispatcher dispatcher = new NotificationDispatcher(
                 List.of(new SlackNotificationChannel(renderer)),
                 renderer,
-                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
+                mock(AuditService.class));
         IncidentCandidate incident = new IncidentCandidate(
                 UUID.randomUUID(),
                 "LOW incident",

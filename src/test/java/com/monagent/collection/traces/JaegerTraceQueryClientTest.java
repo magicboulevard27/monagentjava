@@ -44,7 +44,8 @@ class JaegerTraceQueryClientTest {
 
         assertThat(result.payload()).containsKey("data");
         assertThat(requestRef.get().url().toString()).contains("https://jaeger.internal/api/traces");
-        assertThat(requestRef.get().url().getQuery()).contains("start=2026-07-24T06:45:00Z");
-        assertThat(requestRef.get().url().getQuery()).contains("end=2026-07-24T07:00:00Z");
+        assertThat(requestRef.get().url().getQuery()).contains("service=orders");
+        assertThat(requestRef.get().url().getQuery()).contains("operation=GET /checkout");
+        assertThat(requestRef.get().url().getQuery()).contains("status=error");
     }
 }

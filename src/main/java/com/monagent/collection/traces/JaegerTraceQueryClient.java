@@ -1,6 +1,7 @@
 package com.monagent.collection.traces;
 
 import java.util.Map;
+
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -27,8 +28,6 @@ public class JaegerTraceQueryClient implements TraceQueryClient {
                         .queryParam("service", query.serviceName())
                         .queryParam("operation", query.operation())
                         .queryParam("status", query.status())
-                        .queryParam("start", query.incidentWindowStart().toString())
-                        .queryParam("end", query.incidentWindowEnd().toString())
                         .build()
                         .toUri())
                 .accept(MediaType.APPLICATION_JSON)
