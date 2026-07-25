@@ -162,4 +162,147 @@ class IncidentCorrelationServiceTest {
         assertThat(service.transition(IncidentLifecycleState.ACTIVE, false, true)).isEqualTo(IncidentLifecycleState.SUPPRESSED);
         assertThat(service.transition(IncidentLifecycleState.MERGED, false, false)).isEqualTo(IncidentLifecycleState.MERGED);
     }
+
+    @Test
+    void correlatesUpstreamAndDownstreamDependenciesIntoNarrative() {
+        IncidentRepository incidentRepository = mock(IncidentRepository.class);
+        IncidentEvidenceRepository evidenceRepository = mock(IncidentEvidenceRepository.class);
+        IncidentCorrelationService service = new IncidentCorrelationService(incidentRepository, evidenceRepository);
+
+        UUID upstreamService = UUID.randomUUID();
+        UUID downstreamService = UUID.randomUUID();
+        AnomalyOutcome upstream = new AnomalyOutcome(
+                UUID.randomUUID(),
+                upstreamService,
+                UUID.randomUUID(),
+                "checkout",
+                new BigDecimal("80"),
+                new BigDecimal("91"),
+                ThresholdComparator.GREATER_THAN,
+                "HIGH",
+                "TRIGGERED",
+                5,
+                3,
+                Instant.parse("2026-07-22T10:00:00Z"),
+                Instant.parse("2026-07-22T10:10:00Z"),
+                List.of("upstream-ref"));
+        AnomalyOutcome downstream = new AnomalyOutcome(
+                UUID.randomUUID(),
+                downstreamService,
+                UUID.randomUUID(),
+                "payments",
+                new BigDecimal("85"),
+                new BigDecimal("93"),
+                ThresholdComparator.GREATER_THAN,
+                "HIGH",
+                "TRIGGERED",
+                5,
+                3,
+                Instant.parse("2026-07-22T10:05:00Z"),
+                Instant.parse("2026-07-22T10:15:00Z"),
+                List.of("downstream-ref"));
+
+        var candidate = service.correlate(List.of(upstream, downstream));
+
+        assertThat(candidate.summary()).contains("Upstream dependency impact from service");
+        assertThat(candidate.likelyRootCause()).contains(upstreamService.toString());
+        assertThat(candidate.likelyRootCause()).contains(downstreamService.toString());
+    }
+
+    @Test
+    void correlatesSharedInfrastructureAndRepeatedPatterns() {
+        IncidentRepository incidentRepository = mock(IncidentRepository.class);
+        IncidentEvidenceRepository evidenceRepository = mock(IncidentEvidenceRepository.class);
+        IncidentCorrelationService service = new IncidentCorrelationService(incidentRepository, evidenceRepository);
+
+        UUID sharedService = UUID.randomUUID();
+        AnomalyOutcome first = new AnomalyOutcome(
+                UUID.randomUUID(),
+                sharedService,
+                UUID.randomUUID(),
+                "db.pool",
+                new BigDecimal("90"),
+                new BigDecimal("94"),
+                ThresholdComparator.GREATER_THAN,
+                "HIGH",
+                "TRIGGERED",
+                5,
+                3,
+                Instant.parse("2026-07-22T10:00:00Z"),
+                Instant.parse("2026-07-22T10:10:00Z"),
+                List.of("log-ref-1"));
+        AnomalyOutcome second = new AnomalyOutcome(
+                UUID.randomUUID(),
+                sharedService,
+                UUID.randomUUID(),
+                "db.pool",
+                new BigDecimal("90"),
+                new BigDecimal("95"),
+                ThresholdComparator.GREATER_THAN,
+                "HIGH",
+                "TRIGGERED",
+                5,
+                3,
+                Instant.parse("2026-07-22T10:05:00Z"),
+                Instant.parse("2026-07-22T10:15:00Z"),
+                List.of("log-ref-2"));
+
+        var candidate = service.correlate(List.of(first, second));
+
+        assertThat(candidate.summary()).contains("Repeated log pattern or shared infrastructure symptom");
+        assertThat(candidate.likelyRootCause()).contains("Repeated log pattern or shared infrastructure symptom");
+    }
+
+    @Test
+    void correlatesTracePathsWithDeploymentEvents() {
+        IncidentRepository incidentRepository = mock(IncidentRepository.class);
+        IncidentEvidenceRepository evidenceRepository = mock(IncidentEvidenceRepository.class);
+        IncidentCorrelationService service = new IncidentCorrelationService(incidentRepository, evidenceRepository);
+
+        UUID serviceId = UUID.randomUUID();
+        AnomalyOutcome anomaly = new AnomalyOutcome(
+                UUID.randomUUID(),
+                serviceId,
+                UUID.randomUUID(),
+                "checkout",
+                new BigDecimal("80"),
+                new BigDecimal("92"),
+                ThresholdComparator.GREATER_THAN,
+                "HIGH",
+                "TRIGGERED",
+                5,
+                3,
+                Instant.parse("2026-07-22T10:20:00Z"),
+                Instant.parse("2026-07-22T10:30:00Z"),
+                List.of("trace-ref"));
+
+        com.monagent.collection.traces.TraceFinding traceFinding = new com.monagent.collection.traces.TraceFinding(
+                serviceId,
+                "checkout",
+                "production",
+                "GET /checkout",
+                2450L,
+                "error",
+                "payments",
+                "trace path through payments",
+                Instant.parse("2026-07-22T10:18:00Z"),
+                "trace-ref");
+
+        com.monagent.collection.kubernetes.DeploymentContextFinding deploymentFinding =
+                new com.monagent.collection.kubernetes.DeploymentContextFinding(
+                        serviceId,
+                        "checkout",
+                        "production",
+                        "Deployment",
+                        "rollout",
+                        "deployment rollout completed",
+                        Instant.parse("2026-07-22T10:10:00Z"),
+                        "deploy-ref");
+
+        var candidate = service.correlate(List.of(anomaly), List.of(traceFinding), List.of(deploymentFinding));
+
+        assertThat(candidate.summary()).contains("Trace path through GET /checkout -> payments latency=2450ms");
+        assertThat(candidate.summary()).contains("Symptoms began after deployment event rollout on Deployment");
+        assertThat(candidate.likelyRootCause()).contains("Trace path through GET /checkout -> payments latency=2450ms");
+    }
 }

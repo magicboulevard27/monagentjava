@@ -36,6 +36,13 @@ public class IncidentCorrelationService {
 
     @Transactional
     public IncidentCandidate correlate(List<AnomalyOutcome> anomalies) {
+        return correlate(anomalies, List.of(), List.of());
+    }
+
+    @Transactional
+    public IncidentCandidate correlate(List<AnomalyOutcome> anomalies,
+                                       List<com.monagent.collection.traces.TraceFinding> traceFindings,
+                                       List<com.monagent.collection.kubernetes.DeploymentContextFinding> deploymentFindings) {
         if (anomalies == null || anomalies.isEmpty()) {
             throw new IllegalArgumentException("At least one anomaly outcome is required");
         }
@@ -64,8 +71,12 @@ public class IncidentCorrelationService {
         IncidentImpact impact = assessImpact(sorted, customerImpact);
         String severity = IncidentSeverityClassifier.classify(serviceDown, dataLoss, customerImpact, affectedServices.size());
         String title = buildTitle(sorted, severity);
-        String summary = buildSummary(sorted);
-        String likelyRootCause = inferLikelyRootCause(sorted);
+        String dependencyNarrative = buildDependencyNarrative(sorted);
+        String infrastructureNarrative = buildInfrastructureNarrative(sorted);
+        String traceNarrative = buildTraceNarrative(traceFindings);
+        String deploymentNarrative = buildDeploymentNarrative(sorted, deploymentFindings);
+        String summary = buildSummary(sorted, dependencyNarrative, infrastructureNarrative, traceNarrative, deploymentNarrative);
+        String likelyRootCause = inferLikelyRootCause(sorted, dependencyNarrative, infrastructureNarrative, traceNarrative, deploymentNarrative);
         String confidence = impact.blastRadiusElevated() ? "MEDIUM" : "HIGH";
 
         IncidentEntity incident = new IncidentEntity();
@@ -228,18 +239,130 @@ public class IncidentCorrelationService {
         return severity + " incident on " + primary;
     }
 
-    private String buildSummary(List<AnomalyOutcome> anomalies) {
-        return anomalies.stream()
+    private String buildSummary(List<AnomalyOutcome> anomalies, String dependencyNarrative,
+                                String infrastructureNarrative, String traceNarrative, String deploymentNarrative) {
+        String summary = anomalies.stream()
                 .map(outcome -> outcome.metricName() + "=" + outcome.observedValue())
                 .collect(Collectors.joining(", "));
+        if (dependencyNarrative != null && !dependencyNarrative.isBlank()) {
+            return summary + " | " + dependencyNarrative;
+        }
+        if (infrastructureNarrative != null && !infrastructureNarrative.isBlank()) {
+            return summary + " | " + infrastructureNarrative;
+        }
+        List<String> extras = new ArrayList<>();
+        if (traceNarrative != null && !traceNarrative.isBlank()) {
+            extras.add(traceNarrative);
+        }
+        if (deploymentNarrative != null && !deploymentNarrative.isBlank()) {
+            extras.add(deploymentNarrative);
+        }
+        if (!extras.isEmpty()) {
+            return summary + " | " + String.join(" | ", extras);
+        }
+        return summary;
     }
 
-    private String inferLikelyRootCause(List<AnomalyOutcome> anomalies) {
+    private String inferLikelyRootCause(List<AnomalyOutcome> anomalies, String dependencyNarrative,
+                                        String infrastructureNarrative, String traceNarrative, String deploymentNarrative) {
+        if (dependencyNarrative != null && !dependencyNarrative.isBlank()) {
+            return dependencyNarrative;
+        }
+        if (infrastructureNarrative != null && !infrastructureNarrative.isBlank()) {
+            return infrastructureNarrative;
+        }
+        List<String> extras = new ArrayList<>();
+        if (traceNarrative != null && !traceNarrative.isBlank()) {
+            extras.add(traceNarrative);
+        }
+        if (deploymentNarrative != null && !deploymentNarrative.isBlank()) {
+            extras.add(deploymentNarrative);
+        }
+        if (!extras.isEmpty()) {
+            return String.join(" | ", extras);
+        }
         return anomalies.stream()
                 .map(AnomalyOutcome::metricName)
                 .findFirst()
                 .map(metric -> "Correlated anomaly in " + metric)
                 .orElse("Unknown");
+    }
+
+    private String buildTraceNarrative(List<com.monagent.collection.traces.TraceFinding> traceFindings) {
+        if (traceFindings == null || traceFindings.isEmpty()) {
+            return "";
+        }
+        com.monagent.collection.traces.TraceFinding primary = traceFindings.getFirst();
+        StringBuilder builder = new StringBuilder("Trace path through ");
+        builder.append(primary.spanName());
+        if (primary.dependencyName() != null && !primary.dependencyName().isBlank()) {
+            builder.append(" -> ").append(primary.dependencyName());
+        }
+        builder.append(" latency=").append(primary.durationMillis()).append("ms");
+        return builder.toString();
+    }
+
+    private String buildDeploymentNarrative(List<AnomalyOutcome> anomalies,
+                                            List<com.monagent.collection.kubernetes.DeploymentContextFinding> deploymentFindings) {
+        if (deploymentFindings == null || deploymentFindings.isEmpty()) {
+            return "";
+        }
+        Instant firstAnomaly = anomalies.stream()
+                .map(AnomalyOutcome::detectedAt)
+                .min(Instant::compareTo)
+                .orElse(null);
+        com.monagent.collection.kubernetes.DeploymentContextFinding latestDeployment = deploymentFindings.stream()
+                .sorted(Comparator.comparing(com.monagent.collection.kubernetes.DeploymentContextFinding::observedAt))
+                .reduce((left, right) -> right)
+                .orElse(null);
+        if (firstAnomaly == null || latestDeployment == null) {
+            return "";
+        }
+        String relation = latestDeployment.observedAt().isBefore(firstAnomaly)
+                ? "Symptoms began after deployment event "
+                : "Symptoms were observed before deployment event ";
+        return relation + latestDeployment.eventType() + " on " + latestDeployment.resourceKind();
+    }
+
+    private String buildInfrastructureNarrative(List<AnomalyOutcome> anomalies) {
+        if (anomalies.isEmpty()) {
+            return "";
+        }
+        Map<UUID, Long> serviceCounts = anomalies.stream()
+                .filter(outcome -> outcome.serviceId() != null)
+                .collect(Collectors.groupingBy(AnomalyOutcome::serviceId, LinkedHashMap::new, Collectors.counting()));
+        List<Map.Entry<UUID, Long>> repeatedServices = serviceCounts.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .toList();
+        if (!repeatedServices.isEmpty()) {
+            Map.Entry<UUID, Long> top = repeatedServices.getFirst();
+            return "Repeated log pattern or shared infrastructure symptom across service " + top.getKey()
+                    + " repeated " + top.getValue() + " times";
+        }
+        Map<String, Long> metricCounts = anomalies.stream()
+                .collect(Collectors.groupingBy(AnomalyOutcome::metricName, LinkedHashMap::new, Collectors.counting()));
+        List<Map.Entry<String, Long>> repeatedMetrics = metricCounts.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .toList();
+        if (!repeatedMetrics.isEmpty()) {
+            Map.Entry<String, Long> top = repeatedMetrics.getFirst();
+            return "Repeated log pattern or shared infrastructure symptom on " + top.getKey()
+                    + " observed " + top.getValue() + " times";
+        }
+        return "";
+    }
+
+    private String buildDependencyNarrative(List<AnomalyOutcome> anomalies) {
+        if (anomalies.size() < 2) {
+            return "";
+        }
+        AnomalyOutcome upstream = anomalies.getFirst();
+        AnomalyOutcome downstream = anomalies.getLast();
+        if (upstream.serviceId() == null || downstream.serviceId() == null || upstream.serviceId().equals(downstream.serviceId())) {
+            return "";
+        }
+        return "Upstream dependency impact from service " + upstream.serviceId()
+                + " to downstream service " + downstream.serviceId();
     }
 
     private String toJsonArray(List<String> values) {

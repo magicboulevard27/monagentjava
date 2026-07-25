@@ -213,10 +213,10 @@
 ## 15. Correlation and Incident Management - Quản lý tương quan và sự cố
 - [x] Define incident-candidate and evidence-package models.
 - [x] Correlate anomalies by time window and affected service.
-- [ ] Correlate upstream and downstream dependencies.
-- [ ] Correlate shared infrastructure and repeated log patterns.
-- [ ] Correlate trace paths and deployment events.
-- [ ] Determine whether symptoms began before or after a deployment.
+- [x] Correlate upstream and downstream dependencies.
+- [x] Correlate shared infrastructure and repeated log patterns.
+- [x] Correlate trace paths and deployment events.
+- [x] Determine whether symptoms began before or after a deployment.
 - [x] Merge duplicate incident candidates and update active incidents.
 - [x] Define incident lifecycle states and transition rules.
 - [x] Implement severity classification for `LOW`, `MEDIUM`, `HIGH`, and `CRITICAL`.
