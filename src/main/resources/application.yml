@@ -86,6 +86,9 @@ monagent:
       base-url: ${MONAGENT_OLLAMA_BASE_URL:http://localhost:11434}
       model: ${MONAGENT_OLLAMA_MODEL:llama3.1:8b-instruct}
       request-timeout-seconds: ${MONAGENT_OLLAMA_TIMEOUT_SECONDS:30}
+      retry-attempts: ${MONAGENT_OLLAMA_RETRY_ATTEMPTS:3}
+      circuit-breaker-failure-threshold: ${MONAGENT_OLLAMA_CIRCUIT_BREAKER_FAILURE_THRESHOLD:50}
+      bulkhead-max-concurrent-calls: ${MONAGENT_OLLAMA_BULKHEAD_MAX_CONCURRENT_CALLS:2}
     notifications:
       enabled-channels:
         - ${MONAGENT_NOTIFICATION_CHANNEL_1:slack}

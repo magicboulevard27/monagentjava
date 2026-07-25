@@ -1,0 +1,32 @@
+[
+  {
+    "caseId": "ai-eval-001",
+    "incidentSummary": "orders-api is down after a deployment",
+    "expectedSeverity": "CRITICAL",
+    "expectedStatus": "ACTIVE",
+    "expectedServices": ["orders-api"],
+    "expectedRootCause": "deployment regression",
+    "expectedEscalate": true,
+    "notes": "Ground the answer in deployment evidence and service-down signals."
+  },
+  {
+    "caseId": "ai-eval-002",
+    "incidentSummary": "payments-api has elevated latency and database pool exhaustion",
+    "expectedSeverity": "HIGH",
+    "expectedStatus": "ACTIVE",
+    "expectedServices": ["payments-api"],
+    "expectedRootCause": "database connection pressure",
+    "expectedEscalate": true,
+    "notes": "Prefer the database-pool signal over speculative causes."
+  },
+  {
+    "caseId": "ai-eval-003",
+    "incidentSummary": "log evidence shows repeated authentication failures",
+    "expectedSeverity": "MEDIUM",
+    "expectedStatus": "ACTIVE",
+    "expectedServices": ["identity-service"],
+    "expectedRootCause": "authentication failure",
+    "expectedEscalate": false,
+    "notes": "Do not infer data loss or compromise without evidence."
+  }
+]

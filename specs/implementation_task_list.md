@@ -228,7 +228,7 @@
 
 - [x] Define a provider-neutral LLM client interface.
 - [x] Implement the Ollama client with configurable endpoint and model.
-- [ ] Add an approved remote-provider adapter only if required.
+- [x] Add an approved remote-provider adapter only if required.
 - [x] Build prompts from normalized evidence, anomalies, traces, logs, and deployment context.
 - [x] Add explicit grounding instructions that prohibit unsupported facts.
 - [x] Apply input redaction before every LLM request.
@@ -236,11 +236,11 @@
 - [x] Parse severity, affected services, status, symptoms, evidence, root cause, confidence, actions, and escalation flag.
 - [x] Reject or safely repair invalid structured output.
 - [x] Verify that cited evidence exists in the evidence package.
-- [ ] Implement request timeout, retry, circuit breaker, and concurrency limits.
+- [x] Implement request timeout, retry, circuit breaker, and concurrency limits.
 - [x] Implement rule-based fallback analysis when the LLM is unavailable.
 - [x] Record model, prompt version, latency, token usage where available, and result status.
-- [ ] Create a sanitized evaluation dataset and expected-result rubric.
-- [ ] Test hallucination resistance, prompt injection, malformed output, and provider outage.
+- [x] Create a sanitized evaluation dataset and expected-result rubric.
+- [x] Test hallucination resistance, prompt injection, malformed output, and provider outage.
 
 ## 17. Recommendation Engine
 

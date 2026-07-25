@@ -28,7 +28,10 @@ public record IntegrationProperties(
     public record Ollama(
             @NotNull URI baseUrl,
             @NotBlank String model,
-            @NotNull Integer requestTimeoutSeconds) {
+            @NotNull Integer requestTimeoutSeconds,
+            @NotNull Integer retryAttempts,
+            @NotNull Integer circuitBreakerFailureThreshold,
+            @NotNull Integer bulkheadMaxConcurrentCalls) {
     }
 
     public record Notifications(

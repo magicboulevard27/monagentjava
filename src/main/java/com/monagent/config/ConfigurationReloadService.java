@@ -52,7 +52,10 @@ public class ConfigurationReloadService {
                 new IntegrationProperties.Ollama(
                         java.net.URI.create(overrides.getProperty("monagent.integrations.ollama.base-url", current.integrations().ollama().baseUrl().toString())),
                         overrides.getProperty("monagent.integrations.ollama.model", current.integrations().ollama().model()),
-                        Integer.valueOf(overrides.getProperty("monagent.integrations.ollama.request-timeout-seconds", current.integrations().ollama().requestTimeoutSeconds().toString()))),
+                        Integer.valueOf(overrides.getProperty("monagent.integrations.ollama.request-timeout-seconds", current.integrations().ollama().requestTimeoutSeconds().toString())),
+                        Integer.valueOf(overrides.getProperty("monagent.integrations.ollama.retry-attempts", current.integrations().ollama().retryAttempts().toString())),
+                        Integer.valueOf(overrides.getProperty("monagent.integrations.ollama.circuit-breaker-failure-threshold", current.integrations().ollama().circuitBreakerFailureThreshold().toString())),
+                        Integer.valueOf(overrides.getProperty("monagent.integrations.ollama.bulkhead-max-concurrent-calls", current.integrations().ollama().bulkheadMaxConcurrentCalls().toString()))),
                 new IntegrationProperties.Notifications(
                         java.util.Arrays.asList(
                                 overrides.getProperty("monagent.integrations.notifications.enabled-channels.0", current.integrations().notifications().enabledChannels().get(0)),

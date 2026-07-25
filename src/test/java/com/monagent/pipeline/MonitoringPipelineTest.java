@@ -83,7 +83,7 @@ class MonitoringPipelineTest {
         NotificationDispatcher dispatcher = new NotificationDispatcher(
                 List.of(new SlackNotificationChannel(renderer), new EmailNotificationChannel(renderer, new com.monagent.config.IntegrationProperties(
                         new com.monagent.config.IntegrationProperties.Database("jdbc:postgresql://localhost:5432/monagent", "monagent", "monagent", "public"),
-                        new com.monagent.config.IntegrationProperties.Ollama(java.net.URI.create("http://localhost:11434"), "llama3.1:8b-instruct", 30),
+                        new com.monagent.config.IntegrationProperties.Ollama(java.net.URI.create("http://localhost:11434"), "llama3.1:8b-instruct", 30, 3, 50, 2),
                         new com.monagent.config.IntegrationProperties.Notifications(List.of("slack", "email"), "monagent@example.com"),
                         new com.monagent.config.IntegrationProperties.Auth("issuer", "audience", "roles"),
                         new com.monagent.config.IntegrationProperties.Observability("metrics", "traces")))),
