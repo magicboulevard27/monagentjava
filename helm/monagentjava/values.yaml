@@ -16,6 +16,10 @@ serviceAccount:
   create: true
   name: ""
 
+rbac:
+  create: true
+  namespaceScoped: true
+
 service:
   type: ClusterIP
   port: 8080

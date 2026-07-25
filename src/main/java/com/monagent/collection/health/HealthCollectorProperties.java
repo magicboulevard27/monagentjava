@@ -12,5 +12,6 @@ import org.springframework.validation.annotation.Validated;
 public record HealthCollectorProperties(
         @NotNull Duration timeout,
         @Min(1) @Max(3600) long intervalSeconds,
-        @Min(0) @Max(10) int retryCount) {
+        @Min(0) @Max(10) int retryCount,
+        boolean collectInfo) {
 }

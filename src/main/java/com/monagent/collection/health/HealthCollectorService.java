@@ -7,6 +7,7 @@ import com.monagent.collection.model.SignalSeverity;
 import com.monagent.collection.model.SignalStatus;
 import com.monagent.api.service.MonitoredServiceService;
 import com.monagent.domain.MonitoredService;
+import com.monagent.web.SelfObservabilityMetrics;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,54 +28,65 @@ public class HealthCollectorService {
     private final HealthCollectorClient client;
     private final HealthCollectorProperties properties;
     private final MonitoringSignalPersistenceService persistenceService;
+    private final SelfObservabilityMetrics metrics;
 
     public HealthCollectorService(
             MonitoredServiceService monitoredServiceService,
             HealthCollectorClient client,
             HealthCollectorProperties properties,
-            MonitoringSignalPersistenceService persistenceService) {
+            MonitoringSignalPersistenceService persistenceService,
+            SelfObservabilityMetrics metrics) {
         this.monitoredServiceService = monitoredServiceService;
         this.client = client;
         this.properties = properties;
         this.persistenceService = persistenceService;
+        this.metrics = metrics;
     }
 
     @Scheduled(fixedDelayString = "${monagent.collectors.health.interval-seconds:60}000")
     public void collect() {
         List<NormalizedSignal> batch = new ArrayList<>();
-        for (MonitoredService service : monitoredServiceService.list()) {
-            if (!service.enabled()) {
-                continue;
-            }
+        for (MonitoredService service : monitoredServiceService.listEnabled()) {
             try {
                 HealthCollectionResult result = collect(service);
                 batch.add(result.signal());
+                metrics.recordCollectorOutcome("health", result.signal().status().name(), true);
             } catch (RuntimeException ex) {
-                // Continue the batch so one bad endpoint does not stop unrelated services.
+                metrics.recordCollectorOutcome("health", "unknown", false);
             }
         }
         persistenceService.saveAll(batch);
     }
 
     public HealthCollectionResult collect(MonitoredService service) {
-        Map<String, Object> payload = client.fetchHealth(service.healthUrl(), properties.timeout());
-        String healthState = stringify(payload.get("status"));
-        boolean dependencyIssue = hasDependencyIssue(payload);
-        SignalStatus status = HealthStatusMapper.mapStatus(healthState, dependencyIssue);
-        SignalSeverity severity = HealthStatusMapper.mapSeverity(status);
+        try {
+            return metrics.time("monagent.collector.latency", "health", () -> {
+                Map<String, Object> payload = client.fetchHealth(service.healthUrl(), properties.timeout());
+                Map<String, Object> infoPayload = properties.collectInfo()
+                        ? client.fetchInfo(service.healthUrl(), properties.timeout())
+                        : Map.of();
+                String healthState = stringify(payload.get("status"));
+                boolean dependencyIssue = hasDependencyIssue(payload);
+                SignalStatus status = HealthStatusMapper.mapStatus(healthState, dependencyIssue);
+                SignalSeverity severity = HealthStatusMapper.mapSeverity(status);
 
-        HealthSourceSignal source = new HealthSourceSignal(
-                service.serviceId(),
-                service.serviceName(),
-                service.environment(),
-                Instant.now(),
-                healthState,
-                dependencyIssue,
-                stringify(payload));
+                HealthSourceSignal source = new HealthSourceSignal(
+                        service.serviceId(),
+                        service.serviceName(),
+                        service.environment(),
+                        Instant.now(),
+                        healthState,
+                        dependencyIssue,
+                        infoPayload.isEmpty() ? stringify(payload) : stringify(payload) + " | info=" + stringify(infoPayload));
 
-        NormalizedSignal normalizedSignal = new com.monagent.collection.SignalNormalizationService().fromHealth(source);
-        persistenceService.save(normalizedSignal);
-        return new HealthCollectionResult(normalizedSignal, true);
+                NormalizedSignal normalizedSignal = new com.monagent.collection.SignalNormalizationService().fromHealth(source);
+                persistenceService.save(normalizedSignal);
+                return new HealthCollectionResult(normalizedSignal, true);
+            });
+        } catch (RuntimeException ex) {
+            metrics.recordCollectorOutcome("health", "unknown", false);
+            throw ex;
+        }
     }
 
     private boolean hasDependencyIssue(Map<String, Object> payload) {

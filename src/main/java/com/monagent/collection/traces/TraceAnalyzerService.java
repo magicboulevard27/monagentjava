@@ -7,6 +7,7 @@ import com.monagent.domain.MonitoredService;
 import com.monagent.persistence.IncidentEvidenceEntity;
 import com.monagent.persistence.IncidentEvidenceRepository;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class TraceAnalyzerService {
     private static final Logger log = LoggerFactory.getLogger(TraceAnalyzerService.class);
 
     private final TraceAnalyzerProperties properties;
-    private final TraceSearchClient client;
+    private final TraceQueryClient client;
     private final TraceRedactor redactor;
     private final TracePatternDetector detector;
     private final SignalNormalizationService normalizationService;
@@ -28,7 +29,7 @@ public class TraceAnalyzerService {
 
     public TraceAnalyzerService(
             TraceAnalyzerProperties properties,
-            TraceSearchClient client,
+            TraceQueryClient client,
             TraceRedactor redactor,
             TracePatternDetector detector,
             SignalNormalizationService normalizationService,
@@ -47,7 +48,15 @@ public class TraceAnalyzerService {
     }
 
     public NormalizedSignal analyze(MonitoredService service, String operation, String status) {
-        Map<String, Object> response = client.query(properties.endpoint(), service.serviceName(), operation, status, properties.timeout());
+        Instant end = Instant.now();
+        Instant start = end.minus(properties.windowMinutes(), ChronoUnit.MINUTES);
+        Map<String, Object> response = client.query(new TraceQuery(
+                service.serviceName(),
+                operation,
+                status,
+                start,
+                end,
+                properties.timeout())).payload();
         long durationMillis = extractDuration(response);
         String summary = redactor.redact(stringify(response));
         String dependencyName = extractDependencyName(response);

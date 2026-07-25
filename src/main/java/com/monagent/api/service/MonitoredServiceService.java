@@ -34,6 +34,15 @@ public class MonitoredServiceService {
     }
 
     @Transactional(readOnly = true)
+    public List<MonitoredService> listEnabled() {
+        log.debug("Loading enabled monitored services");
+        return repository.findAll().stream()
+                .map(MonitoredServiceMapper::toDomain)
+                .filter(MonitoredService::enabled)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public MonitoredService get(UUID serviceId) {
         log.debug("Loading monitored service serviceId={}", serviceId);
         return repository.findById(serviceId)
@@ -78,6 +87,20 @@ public class MonitoredServiceService {
             log.warn("Rejected monitored service with unsupported environment={}", request.environment());
             throw new IllegalArgumentException("Unsupported environment: " + request.environment());
         }
-        URI.create(request.healthUrl());
+        validateHealthUrl(request.healthUrl());
+    }
+
+    private void validateHealthUrl(String healthUrl) {
+        URI uri = URI.create(healthUrl);
+        String scheme = uri.getScheme();
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new IllegalArgumentException("Unsupported health URL scheme: " + scheme);
+        }
+        if (uri.getUserInfo() != null) {
+            throw new IllegalArgumentException("Health URL must not include credentials");
+        }
+        if (uri.getHost() == null || uri.getHost().isBlank()) {
+            throw new IllegalArgumentException("Health URL must include a host");
+        }
     }
 }

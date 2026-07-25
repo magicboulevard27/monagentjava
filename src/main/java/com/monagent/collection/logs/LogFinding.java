@@ -9,6 +9,10 @@ public record LogFinding(
         String environment,
         String pattern,
         String summary,
+        long occurrenceCount,
+        Instant timestamp,
+        String correlationId,
+        String exceptionType,
         Instant observedAt,
         String rawReference) {
 }

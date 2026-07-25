@@ -21,10 +21,7 @@ public class ScheduledCollectorCoordinator {
 
     @Scheduled(fixedDelayString = "${monagent.async.dispatch-interval-ms:60000}")
     public void scheduleCollectors() {
-        for (MonitoredService service : monitoredServiceService.list()) {
-            if (!service.enabled()) {
-                continue;
-            }
+        for (MonitoredService service : monitoredServiceService.listEnabled()) {
             dispatchForService(service);
         }
     }

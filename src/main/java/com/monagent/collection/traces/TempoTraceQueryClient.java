@@ -2,15 +2,17 @@ package com.monagent.collection.traces;
 
 import java.util.Map;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class TraceSearchClient implements TraceQueryClient {
+@Component
+public class TempoTraceQueryClient implements TraceQueryClient {
 
     private final WebClient webClient;
     private final TraceAnalyzerProperties properties;
 
-    public TraceSearchClient(WebClient webClient, TraceAnalyzerProperties properties) {
+    public TempoTraceQueryClient(WebClient webClient, TraceAnalyzerProperties properties) {
         this.webClient = webClient;
         this.properties = properties;
     }

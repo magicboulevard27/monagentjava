@@ -32,10 +32,25 @@ public class SelfObservabilityMetrics {
                 .increment();
     }
 
-    public <T> T time(String metricName, String stage, Callable<T> callable) throws Exception {
+    public void recordCollectorOutcome(String collector, String status, boolean success) {
+        Counter.builder("monagent.collector.outcome")
+                .tag("collector", collector)
+                .tag("status", status)
+                .tag("result", success ? "success" : "failure")
+                .register(meterRegistry)
+                .increment();
+    }
+
+    public <T> T timeCollector(String collector, Callable<T> callable) {
+        return time("monagent.collector.latency", collector, callable);
+    }
+
+    public <T> T time(String metricName, String stage, Callable<T> callable) {
         Timer.Sample sample = Timer.start(meterRegistry);
         try {
             return callable.call();
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
         } finally {
             sample.stop(Timer.builder(metricName).tag("stage", stage).register(meterRegistry));
         }

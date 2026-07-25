@@ -1,0 +1,22 @@
+{{- if and .Values.serviceAccount.create .Values.rbac.create .Values.rbac.namespaceScoped -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "monagentjava.fullname" . }}-collector
+  labels:
+    {{- include "monagentjava.labels" . | nindent 4 }}
+    app.kubernetes.io/component: collector
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "events", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["extensions"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+{{- end -}}

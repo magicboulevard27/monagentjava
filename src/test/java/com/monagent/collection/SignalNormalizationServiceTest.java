@@ -10,8 +10,10 @@ import com.monagent.collection.model.MetricsSourceSignal;
 import com.monagent.collection.model.SignalSeverity;
 import com.monagent.collection.model.SignalStatus;
 import java.time.Instant;
+import java.util.Random;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class SignalNormalizationServiceTest {
 
@@ -54,5 +56,37 @@ class SignalNormalizationServiceTest {
         var signal = service.fromCiCd(new CiCdSourceSignal(UUID.randomUUID(), "order", "prod", Instant.parse("2026-07-22T10:00:00Z"), "Deployment", "sha-123", "ref-5"));
         assertThat(signal.sourceType().name()).isEqualTo("CICD");
         assertThat(signal.signalName()).isEqualTo("deployment.deployment");
+    }
+
+    @Test
+    void rejectsMissingSourceSignals() {
+        assertThatThrownBy(() -> service.fromHealth(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Missing health source signal");
+    }
+
+    @Test
+    void normalizesMalformedMetricValuesAndBlankNames() {
+        var signal = service.fromMetrics(new MetricsSourceSignal(UUID.randomUUID(), "   ", "prod",
+                Instant.parse("2026-07-22T10:00:00Z"), null, Double.NaN, null, "ref-6"));
+        assertThat(signal.signalName()).isEqualTo("unknown");
+        assertThat(signal.signalValue()).isEqualTo("0.0");
+        assertThat(signal.status()).isEqualTo(SignalStatus.UNKNOWN);
+    }
+
+    @Test
+    void propertyBasedNormalizationIsStableForRepeatedInputs() {
+        var random = new Random(42);
+        for (int i = 0; i < 100; i++) {
+            UUID serviceId = UUID.randomUUID();
+            String metricName = random.nextBoolean() ? "cpu" : "memory";
+            double value = random.nextDouble() * 200;
+            var first = service.fromMetrics(new MetricsSourceSignal(serviceId, "svc", "prod",
+                    Instant.parse("2026-07-22T10:00:00Z"), metricName, value, "%", "ref"));
+            var second = service.fromMetrics(new MetricsSourceSignal(serviceId, "svc", "prod",
+                    Instant.parse("2026-07-22T10:00:00Z"), metricName, value, "%", "ref"));
+            assertThat(first.signalId()).isEqualTo(second.signalId());
+            assertThat(first.signalName()).isEqualTo(second.signalName());
+        }
     }
 }

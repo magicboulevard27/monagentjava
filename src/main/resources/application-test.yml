@@ -12,3 +12,10 @@ monitoring:
   application-name: monagentjava-test
   default-timezone: UTC
 
+monagent:
+  collectors:
+    logs:
+      base-url: https://opensearch.internal:9200
+      endpoint: /_search
+      timeout: 5s
+      window-minutes: 15

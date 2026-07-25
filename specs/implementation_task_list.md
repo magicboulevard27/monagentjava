@@ -98,7 +98,7 @@
 - [x] Support development, test, staging, and production environments.
 - [x] Validate health URL, Prometheus job, log index, trace service, namespace, and workload fields.
 - [x] Store owner-team and alert-channel metadata.
-- [ ] Prevent collectors from processing disabled services.
+  - [x] Prevent collectors from processing disabled services.
 - [x] Add unit, repository, and API tests.
 
 ## 7. Common Signal Model and Normalization
@@ -107,28 +107,28 @@
 - [x] Define normalized signal name, value, unit, status, severity, timestamp, and reference fields.
 - [x] Implement source-specific adapters to the common signal model.
 - [x] Normalize service names, environments, timestamps, and correlation identifiers.
-- [ ] Handle missing, stale, malformed, and duplicate source data.
-- [ ] Implement idempotency rules for repeated collection results.
+- [x] Handle missing, stale, malformed, and duplicate source data.
+- [x] Implement idempotency rules for repeated collection results.
 - [x] Persist normalized monitoring signals.
 - [x] Add unit tests for normalization rules.
-- [ ] Add property-based tests for normalization rules.
+- [x] Add property-based tests for normalization rules.
 
 ## 8. Health Collector
 
 - [x] Implement asynchronous polling of `/actuator/health`.
-- [ ] Implement optional polling of `/actuator/info`.
+  - [x] Implement optional polling of `/actuator/info`.
 - [x] Map raw health results to `UP`, `DOWN`, `DEGRADED`, and `UNKNOWN`.
 - [x] Detect failed or warning dependency contributors.
 - [x] Configure interval, timeout, retry, backoff, and jitter.
-- [ ] Apply circuit breakers and bulkheads per monitored endpoint.
-- [ ] Enforce safe URL and network-access rules to prevent SSRF.
-- [ ] Record collection latency, success, failure, and status metrics.
+  - [x] Apply circuit breakers and bulkheads per monitored endpoint.
+  - [x] Enforce safe URL and network-access rules to prevent SSRF.
+  - [x] Record collection latency, success, failure, and status metrics.
 - [x] Persist normalized health signals.
-- [ ] Add tests for healthy, degraded, unavailable, timeout, and malformed responses.
+- [x] Add tests for healthy, degraded, unavailable, timeout, and malformed responses.
 
 ## 9. Prometheus Metrics Collector
 
-- [ ] Implement Prometheus query client authentication and TLS configuration.
+  - [x] Implement Prometheus query client authentication and TLS configuration.
 - [x] Define configurable PromQL templates per service and environment.
 - [x] Collect CPU and memory usage.
 - [x] Collect JVM heap and garbage-collection pause metrics.
@@ -136,31 +136,31 @@
 - [x] Collect database connection-pool utilization.
 - [x] Collect Kafka consumer lag.
 - [x] Collect thread-pool utilization.
-- [ ] Normalize labels, values, units, and timestamps.
-- [ ] Handle missing series, stale values, partial responses, and query failures.
+  - [x] Normalize labels, values, units, and timestamps.
+  - [x] Handle missing series, stale values, partial responses, and query failures.
 - [x] Persist normalized metric signals.
 - [x] Add client and mapping tests.
-- [ ] Add failure-mode tests.
+- [x] Add failure-mode tests.
 
 ## 10. OpenSearch/ELK Log Analyzer
 
-- [ ] Implement the OpenSearch/Elasticsearch client with read-only credentials.
+- [x] Implement the OpenSearch/Elasticsearch client with read-only credentials.
 - [x] Build queries using service, environment, severity, and time window.
 - [x] Detect exceptions, timeouts, and connection-refused errors.
 - [x] Detect database and authentication failures.
 - [x] Detect retry exhaustion and open circuit-breaker events.
 - [x] Detect `OutOfMemoryError` and other critical JVM failures.
-- [ ] Group repeated log events and calculate occurrence counts.
-- [ ] Extract timestamps, correlation IDs, exception types, and safe message summaries.
+- [x] Group repeated log events and calculate occurrence counts.
+- [x] Extract timestamps, correlation IDs, exception types, and safe message summaries.
 - [x] Implement token, credential, PII, payment-data, and connection-string redaction.
 - [x] Store only redacted evidence payloads.
 - [x] Add tests using representative sanitized log samples.
 
 ## 11. Jaeger/Tempo Trace Analyzer
 
-- [ ] Implement a provider-neutral trace-query interface.
-- [ ] Implement the Jaeger adapter.
-- [ ] Implement the Tempo adapter if required for the first release.
+- [x] Implement a provider-neutral trace-query interface.
+- [x] Implement the Jaeger adapter.
+- [x] Implement the Tempo adapter if required for the first release.
 - [x] Query traces by service, operation, status, and incident window.
 - [x] Detect slow request paths and high-latency spans.
 - [x] Detect failed downstream dependencies.
@@ -172,8 +172,8 @@
 
 ## 12. Kubernetes and Deployment Context Collector
 
-- [ ] Implement Kubernetes client configuration for in-cluster and local use.
-- [ ] Define least-privilege read-only Kubernetes RBAC.
+- [X] Implement Kubernetes client configuration for in-cluster and local use.
+- [x] Define least-privilege read-only Kubernetes RBAC.
 - [x] Collect pod status, restart count, workload, scaling, and event data.
 - [x] Collect deployment and rollout history.
 - [x] Collect relevant configuration-change metadata without exposing secrets.
@@ -181,7 +181,7 @@
 - [x] Capture database-migration and infrastructure-change context when available.
 - [x] Preserve event timestamps for before-and-after correlation.
 - [x] Normalize deployment context into signals and evidence.
-- [ ] Add tests using a mock Kubernetes API server.
+- [x] Add tests using a mock Kubernetes API server.
 
 ## 13. Scheduling and Asynchronous Processing
 

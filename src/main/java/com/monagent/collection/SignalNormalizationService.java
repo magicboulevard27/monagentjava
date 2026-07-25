@@ -11,6 +11,7 @@ import com.monagent.collection.model.SignalStatus;
 import com.monagent.collection.model.SourceType;
 import com.monagent.collection.model.TraceSourceSignal;
 import java.time.Instant;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class SignalNormalizationService {
 
     public NormalizedSignal fromHealth(HealthSourceSignal source) {
+        requireSource(source, "health");
         SignalStatus status = switch (normalize(source.healthState())) {
             case "up" -> SignalStatus.UP;
             case "down" -> SignalStatus.DOWN;
@@ -35,17 +37,20 @@ public class SignalNormalizationService {
     }
 
     public NormalizedSignal fromMetrics(MetricsSourceSignal source) {
-        SignalStatus status = source.value() > 0 ? SignalStatus.OK : SignalStatus.UNKNOWN;
+        requireSource(source, "metrics");
+        double value = Double.isFinite(source.value()) ? source.value() : 0d;
+        SignalStatus status = value > 0 ? SignalStatus.OK : SignalStatus.UNKNOWN;
         SignalSeverity severity = switch (normalize(source.metricName())) {
-            case "cpu" -> source.value() > 80 ? SignalSeverity.HIGH : SignalSeverity.NONE;
-            case "memory" -> source.value() > 85 ? SignalSeverity.HIGH : SignalSeverity.NONE;
+            case "cpu" -> value > 80 ? SignalSeverity.HIGH : SignalSeverity.NONE;
+            case "memory" -> value > 85 ? SignalSeverity.HIGH : SignalSeverity.NONE;
             default -> SignalSeverity.NONE;
         };
         return base(source.serviceId(), SourceType.METRICS, source.metricName(), source.observedAt(),
-                Double.toString(source.value()), source.unit(), status, severity, source.rawReference());
+                Double.toString(value), source.unit(), status, severity, source.rawReference());
     }
 
     public NormalizedSignal fromLog(LogSourceSignal source) {
+        requireSource(source, "log");
         SignalSeverity severity = switch (normalize(source.pattern())) {
             case "exception", "timeout", "connectionrefused", "databaseerror", "authenticationfailure",
                  "retryexhaustion", "circuitbreakeropen", "outofmemoryerror" -> SignalSeverity.HIGH;
@@ -56,12 +61,15 @@ public class SignalNormalizationService {
     }
 
     public NormalizedSignal fromTrace(TraceSourceSignal source) {
-        SignalSeverity severity = source.durationMillis() > 2000 ? SignalSeverity.HIGH : SignalSeverity.MEDIUM;
+        requireSource(source, "trace");
+        long durationMillis = Math.max(0L, source.durationMillis());
+        SignalSeverity severity = durationMillis > 2000 ? SignalSeverity.HIGH : SignalSeverity.MEDIUM;
         return base(source.serviceId(), SourceType.TRACES, source.spanName(), source.observedAt(),
-                Long.toString(source.durationMillis()), "ms", SignalStatus.WARN, severity, source.rawReference());
+                Long.toString(durationMillis), "ms", SignalStatus.WARN, severity, source.rawReference());
     }
 
     public NormalizedSignal fromKubernetes(KubernetesSourceSignal source) {
+        requireSource(source, "kubernetes");
         SignalStatus status = switch (normalize(source.eventType())) {
             case "failed", "crashloopbackoff", "unhealthy" -> SignalStatus.DOWN;
             case "warning" -> SignalStatus.DEGRADED;
@@ -73,6 +81,7 @@ public class SignalNormalizationService {
     }
 
     public NormalizedSignal fromCiCd(CiCdSourceSignal source) {
+        requireSource(source, "cicd");
         String name = "deployment." + normalize(source.changeType());
         return base(source.serviceId(), SourceType.CICD, name, source.observedAt(),
                 source.revision(), null, SignalStatus.OK, SignalSeverity.NONE, source.rawReference());
@@ -80,12 +89,16 @@ public class SignalNormalizationService {
 
     private NormalizedSignal base(UUID serviceId, SourceType sourceType, String signalName, Instant observedAt,
             String value, String unit, SignalStatus status, SignalSeverity severity, String rawReference) {
+        String normalizedName = normalizeName(signalName);
+        String normalizedValue = value == null ? "" : value;
         return new NormalizedSignal(
-                UUID.randomUUID(),
+                UUID.nameUUIDFromBytes((serviceId + "|" + sourceType + "|" + normalizedName + "|" + observedAt + "|"
+                        + normalizedValue + "|" + (unit == null ? "" : unit) + "|" + status + "|" + severity + "|"
+                        + (rawReference == null ? "" : rawReference)).getBytes(StandardCharsets.UTF_8)),
                 serviceId,
                 sourceType,
-                normalizeName(signalName),
-                value,
+                normalizedName,
+                normalizedValue,
                 unit,
                 status,
                 severity,
@@ -94,7 +107,8 @@ public class SignalNormalizationService {
     }
 
     private String normalizeName(String value) {
-        return normalize(value).replace(' ', '.');
+        String normalized = normalize(value).replace(' ', '.');
+        return normalized.isBlank() ? "unknown" : normalized;
     }
 
     private String normalize(String value) {
@@ -106,5 +120,11 @@ public class SignalNormalizationService {
             return "";
         }
         return message.length() > 240 ? message.substring(0, 240) : message;
+    }
+
+    private void requireSource(Object source, String type) {
+        if (source == null) {
+            throw new IllegalArgumentException("Missing " + type + " source signal");
+        }
     }
 }

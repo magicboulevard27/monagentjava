@@ -41,23 +41,27 @@ public class PrometheusMetricsCollectorService {
     @Scheduled(fixedDelayString = "${monagent.collectors.prometheus.interval-seconds:60}000")
     public void collect() {
         List<NormalizedSignal> batch = new ArrayList<>();
-        for (MonitoredService service : monitoredServiceService.list()) {
-            if (!service.enabled()) {
-                continue;
-            }
+        for (MonitoredService service : monitoredServiceService.listEnabled()) {
             batch.addAll(collect(service));
         }
         persistenceService.saveAll(batch);
     }
 
     public List<NormalizedSignal> collect(MonitoredService service) {
-        return properties.queries().stream().flatMap(query -> {
-            var response = client.query(PROMETHEUS_API, query.promql(), properties.timeout());
-            return PrometheusMetricMapper.parseInstantVector(service.serviceName(), service.environment(), response, query.name(), query.unit())
-                    .stream()
-                    .map(PrometheusMetricMapper::toSourceSignal)
-                    .map(normalizationService::fromMetrics)
-                    .map(persistenceService::save);
-        }).toList();
+        List<NormalizedSignal> collected = new ArrayList<>();
+        for (var query : properties.queries()) {
+            try {
+                var response = client.query(PROMETHEUS_API, query.promql(), properties.timeout());
+                collected.addAll(PrometheusMetricMapper.parseInstantVector(service.serviceName(), service.environment(), response, query.name(), query.unit())
+                        .stream()
+                        .map(PrometheusMetricMapper::toSourceSignal)
+                        .map(normalizationService::fromMetrics)
+                        .map(persistenceService::save)
+                        .toList());
+            } catch (RuntimeException ex) {
+                log.warn("Skipping Prometheus query due to failure serviceName={} queryName={}", service.serviceName(), query.name(), ex);
+            }
+        }
+        return collected;
     }
 }

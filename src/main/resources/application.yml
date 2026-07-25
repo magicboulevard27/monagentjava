@@ -103,6 +103,7 @@ monagent:
       timeout: ${MONAGENT_HEALTH_TIMEOUT:PT5S}
       interval-seconds: ${MONAGENT_HEALTH_INTERVAL_SECONDS:60}
       retry-count: ${MONAGENT_HEALTH_RETRY_COUNT:1}
+      collect-info: ${MONAGENT_HEALTH_COLLECT_INFO:false}
     logs:
       endpoint: ${MONAGENT_LOGS_ENDPOINT:http://localhost:9200/_search}
       timeout: ${MONAGENT_LOGS_TIMEOUT:PT10S}
@@ -117,6 +118,10 @@ monagent:
       window-minutes: ${MONAGENT_KUBERNETES_WINDOW_MINUTES:15}
     prometheus:
       timeout: ${MONAGENT_PROMETHEUS_TIMEOUT:PT10S}
+      base-url: ${MONAGENT_PROMETHEUS_BASE_URL:http://localhost:9090}
+      bearer-token: ${MONAGENT_PROMETHEUS_BEARER_TOKEN:}
+      basic-auth-username: ${MONAGENT_PROMETHEUS_BASIC_AUTH_USERNAME:}
+      basic-auth-password: ${MONAGENT_PROMETHEUS_BASIC_AUTH_PASSWORD:}
       interval-seconds: ${MONAGENT_PROMETHEUS_INTERVAL_SECONDS:60}
       queries:
         - name: cpu
