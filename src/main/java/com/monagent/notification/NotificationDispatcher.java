@@ -3,6 +3,7 @@ package com.monagent.notification;
 import com.monagent.analysis.IncidentCandidate;
 import com.monagent.analysis.Recommendation;
 import com.monagent.audit.AuditService;
+import com.monagent.security.RedactionService;
 import com.monagent.web.SelfObservabilityMetrics;
 import java.time.Duration;
 import java.time.Instant;
@@ -22,15 +23,18 @@ public class NotificationDispatcher {
     private final NotificationTemplateRenderer renderer;
     private final SelfObservabilityMetrics metrics;
     private final AuditService auditService;
+    private final RedactionService redactionService;
 
     public NotificationDispatcher(List<NotificationChannel> channels,
                                   NotificationTemplateRenderer renderer,
                                   SelfObservabilityMetrics metrics,
-                                  AuditService auditService) {
+                                  AuditService auditService,
+                                  RedactionService redactionService) {
         this.channels = channels.stream().collect(Collectors.toMap(NotificationChannel::channelName, Function.identity()));
         this.renderer = renderer;
         this.metrics = metrics;
         this.auditService = auditService;
+        this.redactionService = redactionService;
     }
 
     public List<NotificationDeliveryResult> dispatch(IncidentCandidate incident, List<Recommendation> recommendations, List<String> enabledChannels) {
@@ -73,11 +77,11 @@ public class NotificationDispatcher {
     }
 
     private void auditSuccess(UUID incidentId, String channelName, String payload) {
-        auditService.record("system", "NOTIFICATION_DELIVERED", channelName, incidentId, payload == null ? "" : payload);
+        auditService.record("system", "NOTIFICATION_DELIVERED", channelName, incidentId, redactionService.redact(payload));
     }
 
     private void auditFailure(UUID incidentId, String channelName, String reason) {
-        auditService.record("system", "NOTIFICATION_FAILED", channelName, incidentId, reason == null ? "" : reason);
+        auditService.record("system", "NOTIFICATION_FAILED", channelName, incidentId, redactionService.redact(reason));
     }
 
     private void sleep(Duration duration) {

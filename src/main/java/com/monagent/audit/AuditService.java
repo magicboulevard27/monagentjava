@@ -2,6 +2,8 @@ package com.monagent.audit;
 
 import com.monagent.persistence.AuditLogEntity;
 import com.monagent.persistence.AuditLogRepository;
+import com.monagent.security.DataEncryptionService;
+import com.monagent.security.RedactionService;
 import java.time.Instant;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -15,9 +17,13 @@ public class AuditService {
     private static final Logger log = LoggerFactory.getLogger(AuditService.class);
 
     private final AuditLogRepository auditLogRepository;
+    private final RedactionService redactionService;
+    private final DataEncryptionService dataEncryptionService;
 
-    public AuditService(AuditLogRepository auditLogRepository) {
+    public AuditService(AuditLogRepository auditLogRepository, RedactionService redactionService, DataEncryptionService dataEncryptionService) {
         this.auditLogRepository = auditLogRepository;
+        this.redactionService = redactionService;
+        this.dataEncryptionService = dataEncryptionService;
     }
 
     @Transactional
@@ -28,9 +34,9 @@ public class AuditService {
         entity.setAction(action);
         entity.setEntityType(entityType);
         entity.setEntityId(entityId);
-        entity.setEventPayload(eventPayload);
+        entity.setEventPayload(dataEncryptionService.encrypt(redactionService.redact(eventPayload)));
         entity.setCreatedAt(Instant.now());
         auditLogRepository.saveAndFlush(entity);
-        return new AuditEvent(entity.getAuditId(), actor, action, entityType, entityId, eventPayload, entity.getCreatedAt());
+        return new AuditEvent(entity.getAuditId(), actor, action, entityType, entityId, redactionService.redact(eventPayload), entity.getCreatedAt());
     }
 }

@@ -78,6 +78,9 @@ monagent:
     archive-location: ${MONAGENT_ARCHIVE_LOCATION:/var/lib/monagent/archive}
   approval:
     allow-production-write-actions: ${MONAGENT_ALLOW_PRODUCTION_WRITE_ACTIONS:false}
+  security:
+    crypto:
+      encryption-key-base64: ${MONAGENT_ENCRYPTION_KEY_BASE64:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=}
   integrations:
     database:
       url: ${MONAGENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monagent}

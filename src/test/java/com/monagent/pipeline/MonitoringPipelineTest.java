@@ -31,6 +31,7 @@ import com.monagent.notification.NotificationDispatcher;
 import com.monagent.notification.NotificationTemplateRenderer;
 import com.monagent.notification.SlackNotificationChannel;
 import com.monagent.audit.AuditService;
+import com.monagent.security.RedactionService;
 import com.monagent.persistence.IncidentEvidenceRepository;
 import com.monagent.persistence.IncidentRepository;
 import com.monagent.persistence.MonitoringSignalRepository;
@@ -90,7 +91,8 @@ class MonitoringPipelineTest {
                         new com.monagent.config.IntegrationProperties.Observability("metrics", "traces")))),
                 renderer,
                 new com.monagent.web.SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
-                mock(AuditService.class));
+                mock(AuditService.class),
+                new com.monagent.security.RedactionService());
 
         var deliveries = dispatcher.dispatch(incident, recommendations, List.of("slack"));
         assertThat(deliveries).hasSize(1);
@@ -114,7 +116,7 @@ class MonitoringPipelineTest {
                           "escalate": true
                         }
                         """),
-                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor()),
+                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor(new RedactionService())),
                 new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()),
                 new com.monagent.web.SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 

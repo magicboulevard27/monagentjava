@@ -21,9 +21,18 @@ public record LogAnalyzerProperties(
 
     public LogAnalyzerProperties {
         boolean hasAuth = hasText(bearerToken) || hasText(basicAuthUsername) || hasText(basicAuthPassword);
-        if (baseUrl != null && hasAuth && !"https".equalsIgnoreCase(baseUrl.getScheme())) {
+        if (baseUrl != null && hasAuth && !isSecure(baseUrl)) {
             throw new IllegalArgumentException("Log search auth requires an https baseUrl");
         }
+    }
+
+    private static boolean isSecure(URI uri) {
+        return "https".equalsIgnoreCase(uri.getScheme()) || isLocal(uri);
+    }
+
+    private static boolean isLocal(URI uri) {
+        String host = uri.getHost();
+        return host != null && (host.equalsIgnoreCase("localhost") || host.equals("127.0.0.1") || host.equals("::1"));
     }
 
     private static boolean hasText(String value) {

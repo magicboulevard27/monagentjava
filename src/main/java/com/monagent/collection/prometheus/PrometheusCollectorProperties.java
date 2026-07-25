@@ -22,9 +22,18 @@ public record PrometheusCollectorProperties(
 
     public PrometheusCollectorProperties {
         boolean hasAuth = hasText(bearerToken) || hasText(basicAuthUsername) || hasText(basicAuthPassword);
-        if (baseUrl != null && !"https".equalsIgnoreCase(baseUrl.getScheme()) && hasAuth) {
+        if (baseUrl != null && !isSecure(baseUrl) && hasAuth) {
             throw new IllegalArgumentException("Prometheus auth requires an https baseUrl");
         }
+    }
+
+    private static boolean isSecure(URI uri) {
+        return "https".equalsIgnoreCase(uri.getScheme()) || isLocal(uri);
+    }
+
+    private static boolean isLocal(URI uri) {
+        String host = uri.getHost();
+        return host != null && (host.equalsIgnoreCase("localhost") || host.equals("127.0.0.1") || host.equals("::1"));
     }
 
     private static boolean hasText(String value) {

@@ -93,7 +93,7 @@ public class MonitoredServiceService {
     private void validateHealthUrl(String healthUrl) {
         URI uri = URI.create(healthUrl);
         String scheme = uri.getScheme();
-        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+        if (!"https".equalsIgnoreCase(scheme) && !isLocal(uri)) {
             throw new IllegalArgumentException("Unsupported health URL scheme: " + scheme);
         }
         if (uri.getUserInfo() != null) {
@@ -102,5 +102,10 @@ public class MonitoredServiceService {
         if (uri.getHost() == null || uri.getHost().isBlank()) {
             throw new IllegalArgumentException("Health URL must include a host");
         }
+    }
+
+    private boolean isLocal(URI uri) {
+        String host = uri.getHost();
+        return host != null && (host.equalsIgnoreCase("localhost") || host.equals("127.0.0.1") || host.equals("::1"));
     }
 }

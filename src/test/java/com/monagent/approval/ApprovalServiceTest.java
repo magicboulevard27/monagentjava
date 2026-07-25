@@ -13,6 +13,8 @@ import com.monagent.persistence.ApprovalRepository;
 import com.monagent.persistence.RecommendationEntity;
 import com.monagent.persistence.RecommendationRepository;
 import com.monagent.audit.AuditService;
+import com.monagent.security.DataEncryptionService;
+import com.monagent.security.SecurityCryptoProperties;
 import com.monagent.web.SelfObservabilityMetrics;
 import java.time.Instant;
 import java.util.List;
@@ -32,7 +34,8 @@ class ApprovalServiceTest {
                 recommendationRepository,
                 auditService,
                 new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
-                mock(ApprovedActionExecutor.class));
+                mock(ApprovedActionExecutor.class),
+                new DataEncryptionService(new SecurityCryptoProperties("MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=")));
 
         UUID recommendationId = UUID.randomUUID();
         RecommendationEntity recommendation = recommendation(recommendationId, RecommendationActionType.RESTART_SERVICE, true);
@@ -56,7 +59,8 @@ class ApprovalServiceTest {
                 recommendationRepository,
                 auditService,
                 new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
-                mock(ApprovedActionExecutor.class));
+                mock(ApprovedActionExecutor.class),
+                new DataEncryptionService(new SecurityCryptoProperties("MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=")));
 
         UUID recommendationId = UUID.randomUUID();
         ApprovalEntity approval = new ApprovalEntity();
@@ -81,7 +85,8 @@ class ApprovalServiceTest {
                 recommendationRepository,
                 auditService,
                 new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
-                mock(ApprovedActionExecutor.class));
+                mock(ApprovedActionExecutor.class),
+                new DataEncryptionService(new SecurityCryptoProperties("MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=")));
 
         UUID recommendationId = UUID.randomUUID();
         RecommendationEntity recommendation = recommendation(recommendationId, RecommendationActionType.ROLLBACK_DEPLOYMENT, true);

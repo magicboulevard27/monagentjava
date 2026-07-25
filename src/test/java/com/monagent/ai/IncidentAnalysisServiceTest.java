@@ -6,6 +6,7 @@ import com.monagent.analysis.AnomalyOutcome;
 import com.monagent.analysis.IncidentCandidate;
 import com.monagent.analysis.IncidentEvidence;
 import com.monagent.analysis.ThresholdComparator;
+import com.monagent.security.RedactionService;
 import com.monagent.web.SelfObservabilityMetrics;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -35,7 +36,7 @@ class IncidentAnalysisServiceTest {
 
         IncidentAnalysisService service = new IncidentAnalysisService(
                 new StubIncidentAnalysisClient(response),
-                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor()),
+                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor(new RedactionService())),
                 new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()),
                 new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
@@ -82,7 +83,7 @@ class IncidentAnalysisServiceTest {
     void fallsBackWhenClientFails() {
         IncidentAnalysisService service = new IncidentAnalysisService(
                 prompt -> { throw new RuntimeException("offline"); },
-                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor()),
+                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor(new RedactionService())),
                 new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()),
                 new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
@@ -128,7 +129,7 @@ class IncidentAnalysisServiceTest {
                           "escalate": true
                         }
                         """),
-                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor()),
+                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor(new RedactionService())),
                 new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()),
                 new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
@@ -155,7 +156,7 @@ class IncidentAnalysisServiceTest {
     void toleratesMalformedOutputByFallingBack() {
         IncidentAnalysisService service = new IncidentAnalysisService(
                 new StubIncidentAnalysisClient("not-json"),
-                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor()),
+                new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor(new RedactionService())),
                 new IncidentAnalysisResultParser(new com.fasterxml.jackson.databind.ObjectMapper()),
                 new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
 
@@ -185,7 +186,7 @@ class IncidentAnalysisServiceTest {
 
     @Test
     void redactsPromptInjectionContentBeforeBuildingThePrompt() {
-        IncidentAnalysisPromptBuilder builder = new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor());
+        IncidentAnalysisPromptBuilder builder = new IncidentAnalysisPromptBuilder(new SensitiveInputRedactor(new RedactionService()));
         String prompt = builder.build(new AiAnalysisRequest(
                 List.of(),
                 List.of(),

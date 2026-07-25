@@ -6,6 +6,7 @@ import com.monagent.persistence.ApprovalRepository;
 import com.monagent.persistence.RecommendationEntity;
 import com.monagent.persistence.RecommendationRepository;
 import com.monagent.audit.AuditService;
+import com.monagent.security.DataEncryptionService;
 import com.monagent.web.SelfObservabilityMetrics;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.Instant;
@@ -26,17 +27,20 @@ public class ApprovalService {
     private final AuditService auditService;
     private final SelfObservabilityMetrics metrics;
     private final ApprovedActionExecutor approvedActionExecutor;
+    private final DataEncryptionService dataEncryptionService;
 
     public ApprovalService(ApprovalRepository approvalRepository,
                            RecommendationRepository recommendationRepository,
                            AuditService auditService,
                            SelfObservabilityMetrics metrics,
-                           ApprovedActionExecutor approvedActionExecutor) {
+                           ApprovedActionExecutor approvedActionExecutor,
+                           DataEncryptionService dataEncryptionService) {
         this.approvalRepository = approvalRepository;
         this.recommendationRepository = recommendationRepository;
         this.auditService = auditService;
         this.metrics = metrics;
         this.approvedActionExecutor = approvedActionExecutor;
+        this.dataEncryptionService = dataEncryptionService;
     }
 
     @Transactional
@@ -52,7 +56,7 @@ public class ApprovalService {
         approval.setRecommendationId(recommendationId);
         approval.setRequestedBy(actor);
         approval.setApprovalStatus(ApprovalStatus.REQUESTED.name());
-        approval.setDecisionReason(reason);
+        approval.setDecisionReason(dataEncryptionService.encrypt(reason));
         approval.setDecidedAt(null);
         approvalRepository.saveAndFlush(approval);
         auditService.record(actor, "APPROVAL_REQUESTED", "recommendation", recommendationId, sanitize(reason));
@@ -70,7 +74,7 @@ public class ApprovalService {
         }
         approval.setApprovedBy(actor);
         approval.setApprovalStatus(ApprovalStatus.APPROVED.name());
-        approval.setDecisionReason(reason);
+        approval.setDecisionReason(dataEncryptionService.encrypt(reason));
         approval.setDecidedAt(Instant.now());
         approvalRepository.saveAndFlush(approval);
         auditService.record(actor, "APPROVAL_APPROVED", "recommendation", recommendationId, sanitize(reason));
@@ -85,7 +89,7 @@ public class ApprovalService {
         ApprovalEntity approval = loadOpenApproval(recommendationId);
         approval.setApprovedBy(actor);
         approval.setApprovalStatus(ApprovalStatus.REJECTED.name());
-        approval.setDecisionReason(reason);
+        approval.setDecisionReason(dataEncryptionService.encrypt(reason));
         approval.setDecidedAt(Instant.now());
         approvalRepository.saveAndFlush(approval);
         auditService.record(actor, "APPROVAL_REJECTED", "recommendation", recommendationId, sanitize(reason));
@@ -155,7 +159,7 @@ public class ApprovalService {
                 approval.getRequestedBy(),
                 approval.getApprovedBy(),
                 approval.getApprovalStatus(),
-                approval.getDecisionReason(),
+                dataEncryptionService.decrypt(approval.getDecisionReason()),
                 approval.getDecidedAt(),
                 approval.getVersion());
     }

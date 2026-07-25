@@ -303,16 +303,16 @@
 - [ ] Implement authenticated API access using the selected identity provider.
 - [x] Define viewer, operator, approver, administrator, and service roles.
 - [x] Enforce role-based access control on every API and action.
-- [ ] Configure TLS for all external and service-to-service connections.
-- [ ] Use read-only credentials for observability integrations where possible.
-- [ ] Enforce Kubernetes least-privilege RBAC.
-- [ ] Implement centralized input and output redaction.
+- [x] Configure TLS for all external and service-to-service connections.
+- [x] Use read-only credentials for observability integrations where possible.
+- [x] Enforce Kubernetes least-privilege RBAC.
+- [x] Implement centralized input and output redaction.
 - [ ] Protect against SSRF, injection, path traversal, and unsafe deserialization.
 - [x] Add request-size, rate, and timeout limits.
 - [x] Add secure HTTP headers and restrictive CORS configuration.
-- [ ] Encrypt sensitive stored data where required.
-- [ ] Create a threat model for collectors, LLM prompts, APIs, and action execution.
-- [ ] Run static analysis, dependency scanning, secret scanning, and container scanning.
+- [x] Encrypt sensitive stored data where required.
+- [x] Create a threat model for collectors, LLM prompts, APIs, and action execution.
+- [x] Run static analysis, dependency scanning, secret scanning, and container scanning.
 - [x] Complete security tests and remediate critical or high findings.
 
 ## 22. Audit Service and Data Governance - Dịch vụ kiểm toán và quản trị dữ liệu
