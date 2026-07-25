@@ -188,27 +188,27 @@
 - [x] Implement independently scheduled collector jobs.
 - [x] Prevent a slow source from blocking unrelated collectors.
 - [x] Configure bounded executors, queue sizes, and rejection handling.
-- [ ] Implement distributed locking or leader election for scheduled work.
-- [ ] Define retry, dead-letter, and poison-message behavior.
-- [ ] Add idempotency keys for queued commands and events.
-- [ ] Implement backpressure and per-source rate limits.
+- [x] Implement distributed locking or leader election for scheduled work.
+- [x] Define retry, dead-letter, and poison-message behavior.
+- [x] Add idempotency keys for queued commands and events.
+- [x] Implement backpressure and per-source rate limits.
 - [x] Expose worker backlog, throughput, latency, and failure metrics.
 - [x] Add concurrency, recovery, and duplicate-processing tests.
 
 ## 14. Anomaly Detection Engine - Công cụ phát hiện bất thường
 
-- [ ] Define threshold policies by service, environment, metric, and severity.
+- [x] Define threshold policies by service, environment, metric, and severity.
 - [x] Implement error-rate threshold detection with a default of greater than 5%.
 - [x] Implement p95-latency detection with a default of greater than 2 seconds.
 - [x] Implement memory detection with a default of greater than 85%.
 - [x] Implement CPU detection with a default of greater than 80%.
 - [x] Implement service `DOWN` detection.
 - [x] Implement database-pool detection with a default of greater than 90%.
-- [ ] Implement continuously increasing Kafka-lag detection.
-- [ ] Add evaluation windows, minimum sample sizes, hysteresis, and cooldowns.
-- [ ] Suppress duplicate and flapping alerts.
+- [x] Implement continuously increasing Kafka-lag detection.
+- [x] Add evaluation windows, minimum sample sizes, hysteresis, and cooldowns.
+- [x] Suppress duplicate and flapping alerts.
 - [x] Persist anomaly outcomes and supporting signal references.
-- [ ] Add boundary, trend, stale-data, and false-positive tests.
+- [x] Add boundary, trend, stale-data, and false-positive tests.
 
 ## 15. Correlation and Incident Management - Quản lý tương quan và sự cố
 - [x] Define incident-candidate and evidence-package models.

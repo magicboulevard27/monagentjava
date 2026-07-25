@@ -133,3 +133,34 @@ CREATE TABLE audit_logs (
 
 CREATE INDEX idx_audit_logs_actor ON audit_logs(actor);
 CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at);
+
+CREATE TABLE scheduler_leader_locks (
+    lock_name VARCHAR(100) PRIMARY KEY,
+    owner_id VARCHAR(200) NOT NULL,
+    lease_expires_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_scheduler_leader_locks_lease_expires_at ON scheduler_leader_locks(lease_expires_at);
+
+CREATE TABLE collector_dead_letters (
+    dead_letter_id UUID PRIMARY KEY,
+    job_type VARCHAR(50) NOT NULL,
+    service_id VARCHAR(100) NOT NULL,
+    attempt_count INTEGER NOT NULL,
+    reason VARCHAR(500) NOT NULL,
+    payload VARCHAR(1000) NOT NULL,
+    failed_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX idx_collector_dead_letters_failed_at ON collector_dead_letters(failed_at);
+
+CREATE TABLE collector_idempotency_keys (
+    key_id UUID PRIMARY KEY,
+    idempotency_key VARCHAR(200) NOT NULL UNIQUE,
+    job_type VARCHAR(50) NOT NULL,
+    service_id VARCHAR(100) NOT NULL,
+    recorded_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX idx_collector_idempotency_keys_recorded_at ON collector_idempotency_keys(recorded_at);

@@ -21,14 +21,20 @@ public class AnomalyDetectionService {
     private static final Logger log = LoggerFactory.getLogger(AnomalyDetectionService.class);
 
     private final AnomalyOutcomeRepository anomalyOutcomeRepository;
+    private final AnomalyThresholdPolicyService thresholdPolicyService;
 
-    public AnomalyDetectionService(AnomalyOutcomeRepository anomalyOutcomeRepository) {
+    public AnomalyDetectionService(AnomalyOutcomeRepository anomalyOutcomeRepository,
+                                   AnomalyThresholdPolicyService thresholdPolicyService) {
         this.anomalyOutcomeRepository = anomalyOutcomeRepository;
+        this.thresholdPolicyService = thresholdPolicyService;
     }
 
     public AnomalyOutcome evaluate(NormalizedSignal signal) {
-        ThresholdPolicy policy = policyFor(signal);
+        ThresholdPolicy policy = thresholdPolicyService.resolve(signal);
         BigDecimal observedValue = parseObservedValue(signal.signalValue());
+        if (shouldSuppress(signal, policy, observedValue)) {
+            return persistSuppressed(signal, policy, observedValue);
+        }
         boolean triggered = triggered(policy, observedValue, signal);
         Instant detectedAt = signal.collectedAt();
         Instant cooldownUntil = triggered ? detectedAt.plus(Duration.ofMinutes(policy.cooldownMinutes())) : null;
@@ -72,33 +78,125 @@ public class AnomalyDetectionService {
         anomalyOutcomeRepository.saveAndFlush(entity);
     }
 
-    private ThresholdPolicy policyFor(NormalizedSignal signal) {
-        String metric = signal.signalName().toLowerCase();
-        return switch (metric) {
-            case "service.health" -> new ThresholdPolicy(metric, BigDecimal.ZERO, ThresholdComparator.EQUALS, 5, 1, "CRITICAL", "DOWN", 0);
-            case "cpu" -> new ThresholdPolicy(metric, new BigDecimal("80"), ThresholdComparator.GREATER_THAN, 5, 3, "HIGH", "OVER_THRESHOLD", 10);
-            case "memory" -> new ThresholdPolicy(metric, new BigDecimal("85"), ThresholdComparator.GREATER_THAN, 5, 3, "HIGH", "OVER_THRESHOLD", 10);
-            case "request.rate" -> new ThresholdPolicy(metric, BigDecimal.ZERO, ThresholdComparator.GREATER_THAN, 5, 3, "MEDIUM", "SPIKE", 5);
-            case "error.rate" -> new ThresholdPolicy(metric, new BigDecimal("5"), ThresholdComparator.GREATER_THAN, 5, 3, "HIGH", "OVER_THRESHOLD", 10);
-            case "request.latency" -> new ThresholdPolicy(metric, new BigDecimal("2"), ThresholdComparator.GREATER_THAN, 5, 3, "HIGH", "OVER_THRESHOLD", 10);
-            case "db.pool" -> new ThresholdPolicy(metric, new BigDecimal("90"), ThresholdComparator.GREATER_THAN, 5, 3, "HIGH", "OVER_THRESHOLD", 10);
-            case "kafka.lag" -> new ThresholdPolicy(metric, BigDecimal.ZERO, ThresholdComparator.INCREASING, 5, 3, "HIGH", "INCREASING", 10);
-            default -> new ThresholdPolicy(metric, BigDecimal.ZERO, ThresholdComparator.GREATER_THAN, 5, 1, "LOW", "UNKNOWN", 0);
-        };
+    private AnomalyOutcome persistSuppressed(NormalizedSignal signal, ThresholdPolicy policy, BigDecimal observedValue) {
+        AnomalyOutcome outcome = new AnomalyOutcome(
+                UUID.randomUUID(),
+                signal.serviceId(),
+                signal.signalId(),
+                policy.metricName(),
+                policy.thresholdValue(),
+                observedValue,
+                policy.comparator(),
+                policy.severity(),
+                "SUPPRESSED",
+                policy.evaluationWindowMinutes(),
+                policy.minimumSampleSize(),
+                signal.collectedAt(),
+                null,
+                List.of(signal.rawReference()));
+        persist(outcome);
+        return outcome;
+    }
+
+    private boolean shouldSuppress(NormalizedSignal signal, ThresholdPolicy policy, BigDecimal observedValue) {
+        return anomalyOutcomeRepository.findTopByServiceIdAndMetricNameOrderByDetectedAtDesc(signal.serviceId(), policy.metricName())
+                .filter(previous -> previous.getDetectedAt() != null)
+                .map(previous -> isDuplicate(previous, signal, observedValue, policy) || isFlapping(previous, observedValue, policy, signal))
+                .orElse(false);
+    }
+
+    private boolean isDuplicate(AnomalyOutcomeEntity previous, NormalizedSignal signal, BigDecimal observedValue, ThresholdPolicy policy) {
+        return previous.getObservedValue() != null
+                && previous.getSignalId() != null
+                && previous.getSignalId().equals(signal.signalId())
+                && previous.getDetectedAt().plus(Duration.ofMinutes(policy.evaluationWindowMinutes())).isAfter(signal.collectedAt())
+                && previous.getObservedValue().compareTo(observedValue) == 0;
+    }
+
+    private boolean isFlapping(AnomalyOutcomeEntity previous, BigDecimal observedValue, ThresholdPolicy policy, NormalizedSignal signal) {
+        if (previous.getCooldownUntil() == null || !previous.getCooldownUntil().isAfter(signal.collectedAt())) {
+            return false;
+        }
+        return withinHysteresisBand(policy, observedValue);
     }
 
     private boolean triggered(ThresholdPolicy policy, BigDecimal observedValue, NormalizedSignal signal) {
         if (signal.sourceType() == SourceType.HEALTH) {
             return signal.status() == SignalStatus.DOWN;
         }
+        if (policy.comparator() == ThresholdComparator.INCREASING) {
+            return increasing(signal, observedValue, policy);
+        }
+        if (isCoolingDown(signal, policy, observedValue)) {
+            return false;
+        }
         return switch (policy.comparator()) {
-            case GREATER_THAN -> observedValue.compareTo(policy.thresholdValue()) > 0;
-            case GREATER_THAN_OR_EQUAL -> observedValue.compareTo(policy.thresholdValue()) >= 0;
-            case LESS_THAN -> observedValue.compareTo(policy.thresholdValue()) < 0;
-            case LESS_THAN_OR_EQUAL -> observedValue.compareTo(policy.thresholdValue()) <= 0;
+            case GREATER_THAN -> beyondHysteresis(policy, observedValue, true);
+            case GREATER_THAN_OR_EQUAL -> beyondHysteresis(policy, observedValue, true);
+            case LESS_THAN -> beyondHysteresis(policy, observedValue, false);
+            case LESS_THAN_OR_EQUAL -> beyondHysteresis(policy, observedValue, false);
             case EQUALS -> observedValue.compareTo(policy.thresholdValue()) == 0;
-            case INCREASING -> signal.status() == SignalStatus.OK && observedValue.compareTo(policy.thresholdValue()) > 0;
+            case INCREASING -> false;
         };
+    }
+
+    private boolean increasing(NormalizedSignal signal, BigDecimal observedValue, ThresholdPolicy policy) {
+        if (signal.status() != SignalStatus.OK || signal.signalName() == null || !"kafka.lag".equalsIgnoreCase(signal.signalName())) {
+            return false;
+        }
+        List<AnomalyOutcomeEntity> samples = anomalyOutcomeRepository.findTop5ByServiceIdAndMetricNameOrderByDetectedAtDesc(signal.serviceId(), policy.metricName());
+        if (samples.size() < policy.minimumSampleSize()) {
+            return false;
+        }
+        List<AnomalyOutcomeEntity> ordered = samples.stream()
+                .filter(previous -> previous.getDetectedAt() != null && previous.getObservedValue() != null)
+                .sorted((left, right) -> left.getDetectedAt().compareTo(right.getDetectedAt()))
+                .toList();
+        boolean insideWindow = ordered.stream()
+                .allMatch(previous -> !previous.getDetectedAt().isBefore(signal.collectedAt().minus(Duration.ofMinutes(policy.evaluationWindowMinutes()))));
+        if (!insideWindow) {
+            return false;
+        }
+        return ordered.size() >= policy.minimumSampleSize()
+                && isStrictlyIncreasing(ordered)
+                && observedValue.compareTo(policy.thresholdValue()) > 0;
+    }
+
+    private boolean isStrictlyIncreasing(List<AnomalyOutcomeEntity> samples) {
+        BigDecimal previous = null;
+        for (AnomalyOutcomeEntity sample : samples) {
+            BigDecimal current = sample.getObservedValue();
+            if (current == null) {
+                return false;
+            }
+            if (previous != null && current.compareTo(previous) <= 0) {
+                return false;
+            }
+            previous = current;
+        }
+        return true;
+    }
+
+    private boolean isCoolingDown(NormalizedSignal signal, ThresholdPolicy policy, BigDecimal observedValue) {
+        return anomalyOutcomeRepository.findTopByServiceIdAndMetricNameOrderByDetectedAtDesc(signal.serviceId(), policy.metricName())
+                .filter(previous -> previous.getCooldownUntil() != null
+                        && previous.getCooldownUntil().isAfter(signal.collectedAt()))
+                .map(previous -> withinHysteresisBand(policy, observedValue))
+                .orElse(false);
+    }
+
+    private boolean beyondHysteresis(ThresholdPolicy policy, BigDecimal observedValue, boolean above) {
+        BigDecimal band = policy.thresholdValue().multiply(BigDecimal.valueOf(policy.hysteresisPercent())).divide(BigDecimal.valueOf(100));
+        BigDecimal upper = policy.thresholdValue().add(band);
+        BigDecimal lower = policy.thresholdValue().subtract(band);
+        return above ? observedValue.compareTo(upper) > 0 : observedValue.compareTo(lower) < 0;
+    }
+
+    private boolean withinHysteresisBand(ThresholdPolicy policy, BigDecimal observedValue) {
+        BigDecimal band = policy.thresholdValue().multiply(BigDecimal.valueOf(policy.hysteresisPercent())).divide(BigDecimal.valueOf(100));
+        BigDecimal upper = policy.thresholdValue().add(band);
+        BigDecimal lower = policy.thresholdValue().subtract(band);
+        return observedValue.compareTo(lower) >= 0 && observedValue.compareTo(upper) <= 0;
     }
 
     private BigDecimal parseObservedValue(String value) {

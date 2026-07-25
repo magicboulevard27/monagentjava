@@ -10,5 +10,6 @@ public record ThresholdPolicy(
         int minimumSampleSize,
         String severity,
         String outcomeStatus,
-        int cooldownMinutes) {
+        int cooldownMinutes,
+        int hysteresisPercent) {
 }

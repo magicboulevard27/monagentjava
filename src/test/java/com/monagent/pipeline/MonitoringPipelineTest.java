@@ -10,11 +10,14 @@ import com.monagent.ai.IncidentAnalysisService;
 import com.monagent.ai.SensitiveInputRedactor;
 import com.monagent.ai.StubIncidentAnalysisClient;
 import com.monagent.analysis.AnomalyDetectionService;
+import com.monagent.analysis.AnomalyPolicyProperties;
 import com.monagent.analysis.AnomalyOutcome;
+import com.monagent.analysis.AnomalyThresholdPolicyService;
 import com.monagent.analysis.IncidentCandidate;
 import com.monagent.analysis.IncidentCorrelationService;
 import com.monagent.analysis.Recommendation;
 import com.monagent.analysis.RecommendationEngineService;
+import com.monagent.analysis.ThresholdComparator;
 import com.monagent.api.service.MonitoredServiceService;
 import com.monagent.collection.SignalNormalizationService;
 import com.monagent.collection.model.HealthSourceSignal;
@@ -34,8 +37,6 @@ import com.monagent.persistence.RecommendationRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +55,13 @@ class MonitoringPipelineTest {
         NormalizedSignal persisted = persistenceService.save(normalizedSignal);
         assertThat(persisted.signalName()).isEqualTo("service.health");
 
-        AnomalyDetectionService anomalyDetectionService = new AnomalyDetectionService(mock(com.monagent.persistence.AnomalyOutcomeRepository.class));
+        AnomalyDetectionService anomalyDetectionService = new AnomalyDetectionService(
+                mock(com.monagent.persistence.AnomalyOutcomeRepository.class),
+                new AnomalyThresholdPolicyService(
+                        new AnomalyPolicyProperties(List.of(
+                                new AnomalyPolicyProperties.Rule(null, null, "service.health", null, BigDecimal.ZERO,
+                                        ThresholdComparator.EQUALS, "DOWN", "HIGH", 5, 1, 0, 10))),
+                        mock(MonitoredServiceService.class)));
         AnomalyOutcome anomaly = anomalyDetectionService.evaluate(persisted);
         assertThat(anomaly.outcomeStatus()).isEqualTo("TRIGGERED");
 

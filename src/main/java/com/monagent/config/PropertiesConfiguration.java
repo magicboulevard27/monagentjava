@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
         RuntimeProperties.class,
         IntegrationProperties.class,
         ReloadableConfigurationProperties.class,
-        RetentionProperties.class
+        RetentionProperties.class,
+        com.monagent.analysis.AnomalyPolicyProperties.class
 })
 public class PropertiesConfiguration {
 }

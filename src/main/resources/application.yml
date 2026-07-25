@@ -154,9 +154,46 @@ monagent:
         - name: thread.pool
           promql: ${MONAGENT_PROMETHEUS_THREAD_POOL_QUERY:executor_active_threads}
           unit: ${MONAGENT_PROMETHEUS_THREAD_POOL_UNIT:threads}
+  anomaly:
+    rules:
+      - metric-name: cpu
+        threshold-value: 80
+        comparator: GREATER_THAN
+        outcome-status: OVER_THRESHOLD
+        detected-severity: HIGH
+        evaluation-window-minutes: 5
+        minimum-sample-size: 3
+        cooldown-minutes: 10
+        hysteresis-percent: 10
+      - service-name: orders-api
+        environment: production
+        metric-name: memory
+        threshold-value: 75
+        comparator: GREATER_THAN
+        outcome-status: OVER_THRESHOLD
+        detected-severity: CRITICAL
+        evaluation-window-minutes: 5
+        minimum-sample-size: 3
+        cooldown-minutes: 10
+        hysteresis-percent: 15
+      - environment: staging
+        metric-name: error.rate
+        threshold-value: 3
+        comparator: GREATER_THAN
+        outcome-status: OVER_THRESHOLD
+        detected-severity: MEDIUM
+        evaluation-window-minutes: 5
+        minimum-sample-size: 3
+        cooldown-minutes: 5
+        hysteresis-percent: 10
   async:
     dispatch-timeout: ${MONAGENT_ASYNC_DISPATCH_TIMEOUT:PT30S}
     worker-threads: ${MONAGENT_ASYNC_WORKER_THREADS:4}
     queue-capacity: ${MONAGENT_ASYNC_QUEUE_CAPACITY:100}
     collector-pool-size: ${MONAGENT_ASYNC_COLLECTOR_POOL_SIZE:4}
+    max-queued-jobs: ${MONAGENT_ASYNC_MAX_QUEUED_JOBS:1000}
+    per-source-cooldown: ${MONAGENT_ASYNC_PER_SOURCE_COOLDOWN:PT30S}
+    dispatch-retry-attempts: ${MONAGENT_ASYNC_DISPATCH_RETRY_ATTEMPTS:3}
+    dispatch-retry-backoff: ${MONAGENT_ASYNC_DISPATCH_RETRY_BACKOFF:PT5S}
+    leader-lease-duration: ${MONAGENT_ASYNC_LEADER_LEASE_DURATION:PT2M}
     dispatch-interval-ms: ${MONAGENT_ASYNC_DISPATCH_INTERVAL_MS:60000}

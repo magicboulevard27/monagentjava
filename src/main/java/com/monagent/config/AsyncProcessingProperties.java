@@ -12,5 +12,10 @@ public record AsyncProcessingProperties(
         @NotNull Duration dispatchTimeout,
         @Min(1) int workerThreads,
         @Min(1) int queueCapacity,
-        @Min(1) int collectorPoolSize) {
+        @Min(1) int collectorPoolSize,
+        @Min(0) int maxQueuedJobs,
+        @NotNull Duration perSourceCooldown,
+        @Min(1) int dispatchRetryAttempts,
+        @NotNull Duration dispatchRetryBackoff,
+        @NotNull Duration leaderLeaseDuration) {
 }
