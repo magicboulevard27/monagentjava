@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.monagent.analysis.RecommendationActionType;
+import com.monagent.approval.ApprovedActionExecutor;
 import com.monagent.persistence.ApprovalEntity;
 import com.monagent.persistence.ApprovalRepository;
 import com.monagent.persistence.RecommendationEntity;
@@ -30,7 +31,8 @@ class ApprovalServiceTest {
                 approvalRepository,
                 recommendationRepository,
                 auditService,
-                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
+                mock(ApprovedActionExecutor.class));
 
         UUID recommendationId = UUID.randomUUID();
         RecommendationEntity recommendation = recommendation(recommendationId, RecommendationActionType.RESTART_SERVICE, true);
@@ -53,7 +55,8 @@ class ApprovalServiceTest {
                 approvalRepository,
                 recommendationRepository,
                 auditService,
-                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
+                mock(ApprovedActionExecutor.class));
 
         UUID recommendationId = UUID.randomUUID();
         ApprovalEntity approval = new ApprovalEntity();
@@ -77,7 +80,8 @@ class ApprovalServiceTest {
                 approvalRepository,
                 recommendationRepository,
                 auditService,
-                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()));
+                new SelfObservabilityMetrics(new io.micrometer.core.instrument.simple.SimpleMeterRegistry()),
+                mock(ApprovedActionExecutor.class));
 
         UUID recommendationId = UUID.randomUUID();
         RecommendationEntity recommendation = recommendation(recommendationId, RecommendationActionType.ROLLBACK_DEPLOYMENT, true);

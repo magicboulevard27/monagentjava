@@ -36,13 +36,21 @@ public class IncidentQueryService {
         this.incidentReportRenderer = incidentReportRenderer;
     }
 
-    public List<IncidentResponse> list(String severity, String status, Integer limit, Integer offset) {
+    public List<IncidentResponse> list(String severity, String status, Integer limit, Integer offset, String sortBy, String sortDirection) {
         int safeLimit = limit == null ? 50 : Math.min(Math.max(limit, 1), 200);
         int safeOffset = offset == null ? 0 : Math.max(offset, 0);
+        Comparator<IncidentEntity> comparator = switch (sortBy == null ? "detectedAt" : sortBy) {
+            case "severity" -> Comparator.comparing(IncidentEntity::getSeverity, String.CASE_INSENSITIVE_ORDER);
+            case "status" -> Comparator.comparing(IncidentEntity::getStatus, String.CASE_INSENSITIVE_ORDER);
+            default -> Comparator.comparing(IncidentEntity::getDetectedAt);
+        };
+        if (!"asc".equalsIgnoreCase(sortDirection)) {
+            comparator = comparator.reversed();
+        }
         return incidentRepository.findAll().stream()
                 .filter(incident -> severity == null || severity.equalsIgnoreCase(incident.getSeverity()))
                 .filter(incident -> status == null || status.equalsIgnoreCase(incident.getStatus()))
-                .sorted(Comparator.comparing(IncidentEntity::getDetectedAt).reversed())
+                .sorted(comparator)
                 .skip(safeOffset)
                 .limit(safeLimit)
                 .map(this::toResponse)

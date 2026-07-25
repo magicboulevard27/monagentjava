@@ -25,12 +25,18 @@ public class ApprovalService {
     private final RecommendationRepository recommendationRepository;
     private final AuditService auditService;
     private final SelfObservabilityMetrics metrics;
+    private final ApprovedActionExecutor approvedActionExecutor;
 
-    public ApprovalService(ApprovalRepository approvalRepository, RecommendationRepository recommendationRepository, AuditService auditService, SelfObservabilityMetrics metrics) {
+    public ApprovalService(ApprovalRepository approvalRepository,
+                           RecommendationRepository recommendationRepository,
+                           AuditService auditService,
+                           SelfObservabilityMetrics metrics,
+                           ApprovedActionExecutor approvedActionExecutor) {
         this.approvalRepository = approvalRepository;
         this.recommendationRepository = recommendationRepository;
         this.auditService = auditService;
         this.metrics = metrics;
+        this.approvedActionExecutor = approvedActionExecutor;
     }
 
     @Transactional
@@ -88,6 +94,20 @@ public class ApprovalService {
         return toResponse(approval);
     }
 
+    @Transactional
+    public ApprovedActionExecutor.ControlledActionResult executeApprovedAction(UUID recommendationId, String actor) {
+        ApprovalEntity approval = loadOpenOrDecidedApproval(recommendationId);
+        RecommendationEntity recommendation = recommendationRepository.findById(recommendationId)
+                .orElseThrow(() -> new EntityNotFoundException("Recommendation not found: " + recommendationId));
+        auditService.record(actor, "APPROVED_ACTION_REVALIDATED", "recommendation", recommendationId, "state=" + approval.getApprovalStatus());
+        if (!approvedActionExecutor.revalidateTargetState(toRecommendation(recommendation), toResponse(approval))) {
+            ApprovedActionExecutor.ControlledActionResult result = new ApprovedActionExecutor.ControlledActionResult(false, "Target state changed before execution");
+            auditService.record(actor, "APPROVED_ACTION_BLOCKED", "recommendation", recommendationId, result.message());
+            return result;
+        }
+        return approvedActionExecutor.execute(toRecommendation(recommendation), toResponse(approval), actor);
+    }
+
     @Transactional(readOnly = true)
     public List<ApprovalResponse> list() {
         log.debug("Loading approvals");
@@ -100,6 +120,13 @@ public class ApprovalService {
                 .filter(item -> ApprovalStatus.REQUESTED.name().equals(item.getApprovalStatus()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Open approval not found for recommendation: " + recommendationId));
+    }
+
+    private ApprovalEntity loadOpenOrDecidedApproval(UUID recommendationId) {
+        return approvalRepository.findAll().stream()
+                .filter(item -> recommendationId.equals(item.getRecommendationId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Approval not found for recommendation: " + recommendationId));
     }
 
     private void ensureNoExistingDecision(UUID recommendationId) {
@@ -138,5 +165,19 @@ public class ApprovalService {
             return "";
         }
         return value.replaceAll("(?i)(password|secret|token|api[-_ ]?key)=[^\\s,;]+", "$1=[REDACTED]");
+    }
+
+    private com.monagent.analysis.Recommendation toRecommendation(RecommendationEntity recommendation) {
+        return new com.monagent.analysis.Recommendation(
+                recommendation.getRecommendationId(),
+                recommendation.getIncidentId(),
+                com.monagent.analysis.RecommendationActionType.valueOf(recommendation.getActionType()),
+                recommendation.getDescription(),
+                com.monagent.analysis.RecommendationRiskLevel.valueOf(recommendation.getRiskLevel()),
+                recommendation.isRequiresApproval(),
+                recommendation.getStatus(),
+                recommendation.getEvidenceSummary(),
+                List.of(),
+                recommendation.getCreatedAt());
     }
 }

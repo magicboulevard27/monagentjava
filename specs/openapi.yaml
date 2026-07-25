@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: Monagent Java API
+  version: 0.1.0
+paths:
+  /api/v1/incidents:
+    get:
+      summary: List incidents
+      parameters:
+        - in: query
+          name: severity
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            enum: [detectedAt, severity, status]
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+            enum: [asc, desc]
+  /api/v1/recommendations/{recommendationId}/approve:
+    post:
+      summary: Approve a recommendation
+  /api/v1/recommendations/{recommendationId}/reject:
+    post:
+      summary: Reject a recommendation
+  /api/v1/recommendations/{recommendationId}/request:
+    post:
+      summary: Request approval for a recommendation
+  /api/v1/recommendations/{recommendationId}/execute:
+    post:
+      summary: Execute an approved recommendation

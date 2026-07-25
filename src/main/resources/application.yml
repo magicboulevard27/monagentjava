@@ -76,6 +76,8 @@ monagent:
     incident-evidence: ${MONAGENT_RETENTION_INCIDENT_EVIDENCE:P365D}
     audit-logs: ${MONAGENT_RETENTION_AUDIT_LOGS:P365D}
     archive-location: ${MONAGENT_ARCHIVE_LOCATION:/var/lib/monagent/archive}
+  approval:
+    allow-production-write-actions: ${MONAGENT_ALLOW_PRODUCTION_WRITE_ACTIONS:false}
   integrations:
     database:
       url: ${MONAGENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monagent}

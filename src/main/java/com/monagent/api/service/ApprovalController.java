@@ -1,6 +1,7 @@
 package com.monagent.api.service;
 
 import com.monagent.approval.ApprovalDecisionRequest;
+import com.monagent.approval.ApprovedActionExecutor;
 import com.monagent.approval.ApprovalPolicy;
 import com.monagent.approval.ApprovalResponse;
 import com.monagent.approval.ApprovalRole;
@@ -28,10 +29,12 @@ public class ApprovalController {
 
     private final ApprovalService approvalService;
     private final ApprovalPolicy approvalPolicy;
+    private final ApprovedActionExecutor approvedActionExecutor;
 
-    public ApprovalController(ApprovalService approvalService, ApprovalPolicy approvalPolicy) {
+    public ApprovalController(ApprovalService approvalService, ApprovalPolicy approvalPolicy, ApprovedActionExecutor approvedActionExecutor) {
         this.approvalService = approvalService;
         this.approvalPolicy = approvalPolicy;
+        this.approvedActionExecutor = approvedActionExecutor;
     }
 
     @PostMapping("/recommendations/{recommendationId}/approve")
@@ -74,5 +77,13 @@ public class ApprovalController {
             throw new IllegalArgumentException("Actor is not authorized to request approvals");
         }
         return ResponseEntity.ok(approvalService.request(recommendationId, request.actor(), request.reason()));
+    }
+
+    @PostMapping("/recommendations/{recommendationId}/execute")
+    public ApprovedActionExecutor.ControlledActionResult execute(
+            @PathVariable UUID recommendationId,
+            @RequestHeader(name = "X-Actor", defaultValue = "system") String actor) {
+        log.info("Executing approved recommendationId={} actor={}", recommendationId, actor);
+        return approvalService.executeApprovedAction(recommendationId, actor);
     }
 }

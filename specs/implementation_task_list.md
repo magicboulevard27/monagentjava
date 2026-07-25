@@ -278,10 +278,10 @@
 - [x] Require a decision reason and authenticated actor identity.
 - [x] Prevent self-approval when policy requires separation of duties.
 - [x] Prevent duplicate, stale, replayed, and expired approvals.
-- [ ] Revalidate target state immediately before executing an approved action.
-- [ ] Support safe automated actions such as alerting, ticket creation, diagnostic collection, and read-only inspection.
-- [ ] Keep production write actions disabled until explicitly configured.
-- [ ] Audit every request, decision, attempted action, and result.
+- [x] Revalidate target state immediately before executing an approved action.
+- [x] Support safe automated actions such as alerting, ticket creation, diagnostic collection, and read-only inspection.
+- [x] Keep production write actions disabled until explicitly configured.
+- [x] Audit every request, decision, attempted action, and result.
 - [x] Add authorization, concurrency, expiry, and replay-protection tests.
 
 ## 20. REST API and Reporting
@@ -294,8 +294,8 @@
 - [x] Implement `GET /api/v1/reports/incidents/{incidentId}`.
 - [x] Implement Markdown and JSON report endpoints.
 - [x] Add Jakarta Bean Validation and consistent error responses.
-- [ ] Add API pagination, sorting, filtering, and request limits.
-- [ ] Generate and maintain an OpenAPI specification.
+- [x] Add API pagination, sorting, filtering, and request limits.
+- [x] Generate and maintain an OpenAPI specification.
 - [x] Add controller, validation, security, and contract tests.
 
 ## 21. Authentication, Authorization, and Security

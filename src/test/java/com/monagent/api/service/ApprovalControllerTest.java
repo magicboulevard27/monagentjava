@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.monagent.approval.ApprovalPolicy;
 import com.monagent.approval.ApprovalRole;
+import com.monagent.approval.ApprovedActionExecutor;
 import com.monagent.approval.ApprovalService;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +18,7 @@ class ApprovalControllerTest {
     void rejectsUnauthorizedDecisions() {
         ApprovalService approvalService = mock(ApprovalService.class);
         ApprovalPolicy policy = new ApprovalPolicy();
-        ApprovalController controller = new ApprovalController(approvalService, policy);
+        ApprovalController controller = new ApprovalController(approvalService, policy, mock(ApprovedActionExecutor.class));
 
         assertThatThrownBy(() -> controller.approve(UUID.randomUUID(),
                 new com.monagent.approval.ApprovalDecisionRequest("actor", "reason"),
@@ -30,7 +31,7 @@ class ApprovalControllerTest {
     void listsApprovals() {
         ApprovalService approvalService = mock(ApprovalService.class);
         ApprovalPolicy policy = new ApprovalPolicy();
-        ApprovalController controller = new ApprovalController(approvalService, policy);
+        ApprovalController controller = new ApprovalController(approvalService, policy, mock(ApprovedActionExecutor.class));
         when(approvalService.list()).thenReturn(List.of());
 
         List<?> approvals = controller.list();

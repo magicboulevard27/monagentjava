@@ -38,7 +38,7 @@ class IncidentQueryServiceTest {
         when(evidenceRepository.findAll()).thenReturn(List.of());
         when(recommendationRepository.findAll()).thenReturn(List.of());
 
-        assertThat(service.list(null, null, 10, 0)).hasSize(1);
+        assertThat(service.list(null, null, 10, 0, "detectedAt", "desc")).hasSize(1);
         assertThat(service.reportMarkdown(incidentId).content()).contains("Incident");
         assertThat(service.reportJson(incidentId).content()).contains("incident");
     }

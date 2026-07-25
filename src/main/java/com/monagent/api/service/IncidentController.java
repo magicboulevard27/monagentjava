@@ -47,9 +47,11 @@ public class IncidentController {
             @RequestParam(required = false) String severity,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Integer limit,
-            @RequestParam(required = false) Integer offset) {
-        log.info("Listing incidents severity={} status={} limit={} offset={}", severity, status, limit, offset);
-        return incidentQueryService.list(severity, status, limit, offset);
+            @RequestParam(required = false) Integer offset,
+            @RequestParam(required = false, defaultValue = "detectedAt") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String sortDirection) {
+        log.info("Listing incidents severity={} status={} limit={} offset={} sortBy={} sortDirection={}", severity, status, limit, offset, sortBy, sortDirection);
+        return incidentQueryService.list(severity, status, limit, offset, sortBy, sortDirection);
     }
 
     @PostMapping("/incidents/analyze")
