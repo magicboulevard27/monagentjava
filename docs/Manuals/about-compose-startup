@@ -197,3 +197,11 @@ The fix is to clean up the stale state:
   # Then prune orphaned networks and restart
   docker network prune -f
   docker compose up -d
+
+
+# Validation:
+Ran docker compose config successfully
+# If the stack was already created with the stale network, run:
+docker compose down
+docker network rm monagent-net if it still exists
+docker compose up --build
