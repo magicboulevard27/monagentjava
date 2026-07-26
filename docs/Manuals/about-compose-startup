@@ -173,3 +173,27 @@ docker compose --profile observability up --build
 ```
 
 If you want, I can also add this variable to a `.env.example` or make the startup scripts set it automatically.
+
+#######################################################
+The fix is to clean up the stale state:
+
+  # 1. Stop and remove all containers + orphans for this project
+  docker compose down --remove-orphans
+
+  # 2. If that still errors, force-remove any dangling networks
+  docker network prune -f
+
+  # 3. Then bring it back up
+  docker compose up -d
+
+  If the error persists even on docker compose down, the container referencing the dead network needs to be forcibly removed first:
+
+  # Find the container stuck on the stale network
+  docker ps -a
+
+  # Force remove it (replace <container_name> with the actual name)
+  docker rm -f <container_name>
+
+  # Then prune orphaned networks and restart
+  docker network prune -f
+  docker compose up -d

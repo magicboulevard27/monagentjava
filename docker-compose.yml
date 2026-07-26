@@ -14,6 +14,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - monagent-net
 
   monagent:
     build:
@@ -46,6 +48,8 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+    networks:
+      - monagent-net
 
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -58,6 +62,8 @@ services:
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"
+    networks:
+      - monagent-net
 
   opensearch:
     image: opensearchproject/opensearch:2.16.0
@@ -75,6 +81,8 @@ services:
       - opensearch-data:/usr/share/opensearch/data
     ports:
       - "9200:9200"
+    networks:
+      - monagent-net
 
   jaeger:
     image: jaegertracing/all-in-one:1.57
@@ -82,6 +90,8 @@ services:
     ports:
       - "16686:16686"
       - "4317:4317"
+    networks:
+      - monagent-net
 
   ollama:
     image: ollama/ollama:0.3.14
@@ -90,6 +100,8 @@ services:
       - ollama-data:/root/.ollama
     ports:
       - "11434:11434"
+    networks:
+      - monagent-net
 
 volumes:
   postgres-data:
@@ -98,3 +110,7 @@ volumes:
   prometheus-data:
   opensearch-data:
   ollama-data:
+
+networks:
+  monagent-net:
+    name: monagent-net

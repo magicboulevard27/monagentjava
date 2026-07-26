@@ -32,6 +32,8 @@
 - If PostgreSQL does not initialize, inspect `docker compose logs postgres`.
 - If the app cannot connect to Ollama, verify that the `ai` profile is enabled and the model is available.
 - If Prometheus or Jaeger are enabled, verify that their profile-specific ports are not already in use.
+- If Docker reports a missing network ID, run `docker compose down`, then `docker network rm monagent-net` if it still exists, and start again with `docker compose up --build`.
+- If the issue persists after a stale network cleanup, run `docker compose down -v --remove-orphans` and recreate the stack from scratch.
 
 ## Sample Local Configuration
 
