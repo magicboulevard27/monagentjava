@@ -19,11 +19,13 @@ public class AuditService {
     private final AuditLogRepository auditLogRepository;
     private final RedactionService redactionService;
     private final DataEncryptionService dataEncryptionService;
+    private final AuditGovernanceService auditGovernanceService;
 
-    public AuditService(AuditLogRepository auditLogRepository, RedactionService redactionService, DataEncryptionService dataEncryptionService) {
+    public AuditService(AuditLogRepository auditLogRepository, RedactionService redactionService, DataEncryptionService dataEncryptionService, AuditGovernanceService auditGovernanceService) {
         this.auditLogRepository = auditLogRepository;
         this.redactionService = redactionService;
         this.dataEncryptionService = dataEncryptionService;
+        this.auditGovernanceService = auditGovernanceService;
     }
 
     @Transactional
@@ -34,8 +36,11 @@ public class AuditService {
         entity.setAction(action);
         entity.setEntityType(entityType);
         entity.setEntityId(entityId);
-        entity.setEventPayload(dataEncryptionService.encrypt(redactionService.redact(eventPayload)));
+        String payload = dataEncryptionService.encrypt(redactionService.redact(eventPayload));
+        entity.setEventPayload(payload);
         entity.setCreatedAt(Instant.now());
+        entity.setPreviousHash(auditGovernanceService.latestHash());
+        entity.setEventHash(auditGovernanceService.hash(actor, action, entityType, entityId, payload, entity.getCreatedAt(), entity.getPreviousHash()));
         auditLogRepository.saveAndFlush(entity);
         return new AuditEvent(entity.getAuditId(), actor, action, entityType, entityId, redactionService.redact(eventPayload), entity.getCreatedAt());
     }

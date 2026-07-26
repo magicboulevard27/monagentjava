@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
         IntegrationProperties.class,
         ReloadableConfigurationProperties.class,
         RetentionProperties.class,
+        com.monagent.approval.ApprovedActionExecutionProperties.class,
         com.monagent.security.SecurityCryptoProperties.class,
         com.monagent.analysis.AnomalyPolicyProperties.class
 })

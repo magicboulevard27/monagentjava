@@ -8,4 +8,10 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "monagent.approval")
 public record ApprovedActionExecutionProperties(
         @NotNull Boolean allowProductionWriteActions) {
+
+    public ApprovedActionExecutionProperties {
+        if (allowProductionWriteActions == null) {
+            allowProductionWriteActions = Boolean.FALSE;
+        }
+    }
 }

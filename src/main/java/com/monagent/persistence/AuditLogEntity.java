@@ -33,6 +33,12 @@ public class AuditLogEntity {
     @Column(name = "event_payload", columnDefinition = "jsonb")
     private String eventPayload;
 
+    @Column(name = "previous_hash", length = 128)
+    private String previousHash;
+
+    @Column(name = "event_hash", nullable = false, length = 128)
+    private String eventHash;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -85,6 +91,22 @@ public class AuditLogEntity {
 
     public void setEventPayload(String eventPayload) {
         this.eventPayload = eventPayload;
+    }
+
+    public String getPreviousHash() {
+        return previousHash;
+    }
+
+    public void setPreviousHash(String previousHash) {
+        this.previousHash = previousHash;
+    }
+
+    public String getEventHash() {
+        return eventHash;
+    }
+
+    public void setEventHash(String eventHash) {
+        this.eventHash = eventHash;
     }
 
     public Instant getCreatedAt() {

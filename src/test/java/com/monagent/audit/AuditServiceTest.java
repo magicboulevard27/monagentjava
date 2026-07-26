@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.monagent.persistence.AuditLogRepository;
+import com.monagent.audit.AuditGovernanceService;
 import com.monagent.security.DataEncryptionService;
 import com.monagent.security.RedactionService;
 import java.util.UUID;
@@ -15,7 +16,8 @@ class AuditServiceTest {
     @Test
     void recordsAuditEvents() {
         AuditLogRepository repository = mock(AuditLogRepository.class);
-        AuditService service = new AuditService(repository, new RedactionService(), new DataEncryptionService(new com.monagent.security.SecurityCryptoProperties("MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=")));
+        AuditGovernanceService governanceService = new AuditGovernanceService(repository, new com.monagent.config.RetentionProperties(java.time.Duration.ofDays(365), java.time.Duration.ofDays(365), java.time.Duration.ofDays(365), "/tmp/archive"));
+        AuditService service = new AuditService(repository, new RedactionService(), new DataEncryptionService(new com.monagent.security.SecurityCryptoProperties("MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=")), governanceService);
 
         AuditEvent event = service.record("actor", "ACTION", "entity", UUID.randomUUID(), "{\"ok\":true}");
 

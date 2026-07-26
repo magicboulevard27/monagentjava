@@ -320,9 +320,9 @@
 - [x] Define auditable events for analysis, recommendations, notifications, approvals, configuration, and actions.
 - [x] Include actor, action, entity, timestamp, correlation ID, and redacted payload.
 - [x] Make audit events append-only through the application API.
-- [ ] Record failed and denied operations as well as successful operations.
-- [ ] Define audit retention, archival, access, and export requirements.
-- [ ] Add integrity controls appropriate to the compliance requirements.
+- [x] Record failed and denied operations as well as successful operations.
+- [x] Define audit retention, archival, access, and export requirements.
+- [x] Add integrity controls appropriate to the compliance requirements.
 - [x] Test audit completeness and sensitive-data exclusion.
 
 ## 23. Reliability and Failure Handling
