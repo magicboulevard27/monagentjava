@@ -18,3 +18,8 @@ The initial project decisions are recorded in:
 - PostgreSQL as the primary operational database
 - Ollama as the initial local LLM provider
 
+## Operational Docs
+
+- [Dependency Outage Runbook](docs/dependency-outage-runbook.md)
+- [Release Process](docs/release-process.md)
+- [Kubernetes and Helm Deployment](docs/kubernetes-helm.md)

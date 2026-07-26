@@ -30,7 +30,10 @@ class TempoTraceQueryClientTest {
         TraceAnalyzerProperties properties = new TraceAnalyzerProperties(
                 "https://tempo.internal/api/traces",
                 Duration.ofSeconds(5),
-                15);
+                15,
+                3,
+                50,
+                2);
         TempoTraceQueryClient client = new TempoTraceQueryClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), properties);
 
         TraceQueryResult result = client.query(new TraceQuery(

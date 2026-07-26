@@ -37,6 +37,9 @@ class LogSearchClientTest {
                 "/_search",
                 Duration.ofSeconds(5),
                 10,
+                3,
+                50,
+                2,
                 "token-123",
                 null,
                 null);
@@ -66,6 +69,9 @@ class LogSearchClientTest {
                 "/_search",
                 Duration.ofSeconds(5),
                 10,
+                3,
+                50,
+                2,
                 null,
                 "readonly",
                 "secret");

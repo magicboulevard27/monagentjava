@@ -22,6 +22,9 @@ class LogAnalyzerServiceTest {
             "/_search",
             Duration.ofSeconds(5),
             15,
+            3,
+            50,
+            2,
             null,
             null,
             null);

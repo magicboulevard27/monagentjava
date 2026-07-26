@@ -2,6 +2,9 @@ package com.monagent.collection.traces;
 
 import java.util.Map;
 
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,9 @@ public class JaegerTraceQueryClient implements TraceQueryClient {
         this.properties = properties;
     }
 
+    @Retry(name = "traceSearch")
+    @CircuitBreaker(name = "traceSearch", fallbackMethod = "queryFallback")
+    @Bulkhead(name = "traceSearch", fallbackMethod = "queryFallback")
     @SuppressWarnings("unchecked")
     @Override
     public TraceQueryResult query(TraceQuery query) {
@@ -35,5 +41,9 @@ public class JaegerTraceQueryClient implements TraceQueryClient {
                 .bodyToMono(Map.class)
                 .block(query.timeout());
         return new TraceQueryResult(payload);
+    }
+
+    private TraceQueryResult queryFallback(TraceQuery query, Throwable throwable) {
+        return new TraceQueryResult(Map.of("spans", java.util.List.of(), "queryStatus", "unavailable"));
     }
 }

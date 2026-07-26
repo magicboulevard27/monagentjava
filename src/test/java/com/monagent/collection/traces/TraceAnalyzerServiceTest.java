@@ -19,7 +19,10 @@ class TraceAnalyzerServiceTest {
     private final TraceAnalyzerProperties properties = new TraceAnalyzerProperties(
             "https://jaeger.internal/api/traces",
             Duration.ofSeconds(5),
-            15);
+            15,
+            3,
+            50,
+            2);
     private final TraceQueryClient client = mock(TraceQueryClient.class);
     private final TraceRedactor redactor = new TraceRedactor();
     private final TracePatternDetector detector = new TracePatternDetector();

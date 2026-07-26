@@ -15,6 +15,9 @@ class LogAnalyzerPropertiesTest {
                 "/_search",
                 Duration.ofSeconds(10),
                 10,
+                3,
+                50,
+                2,
                 "token",
                 null,
                 null))

@@ -15,6 +15,9 @@ public record LogAnalyzerProperties(
         @NotBlank String endpoint,
         @NotNull Duration timeout,
         @Min(1) int windowMinutes,
+        @Min(1) int retryAttempts,
+        @Min(1) int circuitBreakerFailureThreshold,
+        @Min(1) int bulkheadMaxConcurrentCalls,
         String bearerToken,
         String basicAuthUsername,
         String basicAuthPassword) {

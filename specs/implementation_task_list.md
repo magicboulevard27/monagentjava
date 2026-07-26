@@ -328,15 +328,15 @@
 ## 23. Reliability and Failure Handling
 
 - [x] Continue analysis when health endpoints are unavailable.
-- [ ] Continue without traces when tracing is unavailable.
-- [ ] Continue without logs when log search is unavailable.
+- [x] Continue without traces when tracing is unavailable.
+- [x] Continue without logs when log search is unavailable.
 - [x] Generate rule-based alerts and evidence bundles when the LLM is unavailable.
 - [x] Retry failed notifications and record final delivery failure.
-- [ ] Define readiness behavior for mandatory and optional dependencies.
-- [ ] Add timeouts, retries, circuit breakers, and bulkheads to external calls.
+- [x] Define readiness behavior for mandatory and optional dependencies.
+- [x] Add timeouts, retries, circuit breakers, and bulkheads to external calls.
 - [x] Add graceful degradation indicators to incident reports.
-- [ ] Run fault-injection tests for every external integration.
-- [ ] Document recovery procedures and dependency outage runbooks.
+- [x] Run fault-injection tests for every external integration.
+- [x] Document recovery procedures and dependency outage runbooks.
 
 ## 24. Monitoring Agent Self-Observability
 

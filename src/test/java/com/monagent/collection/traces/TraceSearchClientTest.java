@@ -32,7 +32,10 @@ class TraceSearchClientTest {
         TraceAnalyzerProperties properties = new TraceAnalyzerProperties(
                 "https://jaeger.internal/api/traces",
                 Duration.ofSeconds(5),
-                15);
+                15,
+                3,
+                50,
+                2);
         TraceSearchClient client = new TraceSearchClient(WebClient.builder().exchangeFunction(exchangeFunction).build(), properties);
 
         TraceQueryResult result = client.query(new TraceQuery(

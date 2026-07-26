@@ -2,6 +2,9 @@ package com.monagent.collection.logs;
 
 import java.time.Duration;
 import java.util.Map;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,6 +22,9 @@ public class LogSearchClient {
         this.properties = properties;
     }
 
+    @Retry(name = "logSearch")
+    @CircuitBreaker(name = "logSearch", fallbackMethod = "queryFallback")
+    @Bulkhead(name = "logSearch", fallbackMethod = "queryFallback")
     @SuppressWarnings("unchecked")
     public Map<String, Object> query(String endpoint, String serviceName, String environment, String severity, Duration timeout) {
         return webClient.get()
@@ -34,6 +40,10 @@ public class LogSearchClient {
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block(timeout);
+    }
+
+    private Map<String, Object> queryFallback(String endpoint, String serviceName, String environment, String severity, Duration timeout, Throwable throwable) {
+        return Map.of("hits", Map.of("hits", java.util.List.of()), "queryStatus", "unavailable");
     }
 
     private void applyAuthentication(HttpHeaders headers) {

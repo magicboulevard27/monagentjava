@@ -116,10 +116,16 @@ monagent:
       endpoint: ${MONAGENT_LOGS_ENDPOINT:http://localhost:9200/_search}
       timeout: ${MONAGENT_LOGS_TIMEOUT:PT10S}
       window-minutes: ${MONAGENT_LOGS_WINDOW_MINUTES:15}
+      retry-attempts: ${MONAGENT_LOGS_RETRY_ATTEMPTS:3}
+      circuit-breaker-failure-threshold: ${MONAGENT_LOGS_CIRCUIT_BREAKER_FAILURE_THRESHOLD:50}
+      bulkhead-max-concurrent-calls: ${MONAGENT_LOGS_BULKHEAD_MAX_CONCURRENT_CALLS:2}
     traces:
       endpoint: ${MONAGENT_TRACES_ENDPOINT:http://localhost:16686/api/traces}
       timeout: ${MONAGENT_TRACES_TIMEOUT:PT10S}
       window-minutes: ${MONAGENT_TRACES_WINDOW_MINUTES:15}
+      retry-attempts: ${MONAGENT_TRACES_RETRY_ATTEMPTS:3}
+      circuit-breaker-failure-threshold: ${MONAGENT_TRACES_CIRCUIT_BREAKER_FAILURE_THRESHOLD:50}
+      bulkhead-max-concurrent-calls: ${MONAGENT_TRACES_BULKHEAD_MAX_CONCURRENT_CALLS:2}
     kubernetes:
       endpoint: ${MONAGENT_KUBERNETES_ENDPOINT:http://localhost:8001/apis/monitoring.monagent.io/v1/events}
       timeout: ${MONAGENT_KUBERNETES_TIMEOUT:PT10S}
