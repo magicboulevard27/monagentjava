@@ -45,6 +45,14 @@ public class SelfObservabilityMetrics {
         return time("monagent.collector.latency", collector, callable);
     }
 
+    public <T> T timeSourceQuery(String source, Callable<T> callable) {
+        return time("monagent.source.query.latency", source, callable);
+    }
+
+    public <T> T timeAiReasoning(String provider, Callable<T> callable) {
+        return time("monagent.ai.reasoning.latency", provider, callable);
+    }
+
     public <T> T time(String metricName, String stage, Callable<T> callable) {
         Timer.Sample sample = Timer.start(meterRegistry);
         try {
