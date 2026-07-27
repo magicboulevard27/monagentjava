@@ -9,7 +9,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read and write
+      workflows : read and write
       packages: write
     steps:
       - name: Checkout
