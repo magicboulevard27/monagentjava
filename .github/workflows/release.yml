@@ -25,6 +25,9 @@ jobs:
       - name: Build release artifacts
         run: mvn -B clean verify package
 
+      - name: Validate database migrations and smoke tests
+        run: mvn -B -Dtest=MigrationManifestTest,MonagentApplicationSmokeTest test
+
       - name: Build container image
         run: docker build -t monagentjava:${{ github.ref_name }} .
 

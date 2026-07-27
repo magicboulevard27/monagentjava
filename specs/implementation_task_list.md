@@ -390,8 +390,8 @@
 - [x] Generate a Software Bill of Materials (SBOM).
 - [ ] Sign and publish versioned build artifacts and container images.
 - [ ] Configure deployment promotion across environments.
-- [ ] Add database migration checks and rollback procedures.
-- [ ] Add post-deployment smoke and health tests.
+- [x] Add database migration checks and rollback procedures.
+- [x] Add post-deployment smoke and health tests.
 - [x] Define release notes, semantic versioning, and rollback criteria.
 
 ## 28. Local Deployment with Docker Compose
@@ -408,7 +408,7 @@
 
 - [x] Create Deployments for API, collector worker, analysis worker, and notification worker.
 - [x] Create Services, ConfigMaps, Secrets references, and service accounts.
-- [ ] Create least-privilege Roles and RoleBindings.
+- [x] Create least-privilege Roles and RoleBindings.
 - [x] Configure liveness, readiness, and startup probes.
 - [x] Configure resource requests and limits.
 - [x] Configure horizontal pod autoscaling and pod disruption budgets.
@@ -416,21 +416,21 @@
 - [x] Configure NetworkPolicies and secure ingress.
 - [x] Create Helm charts with environment-specific values.
 - [x] Add optional Ollama deployment guidance and resource requirements.
-- [ ] Validate rolling upgrade, rollback, failover, and disaster recovery.
+- [x] Validate rolling upgrade, rollback, failover, and disaster recovery.
 
 ## 30. Documentation and Operational Readiness
 
-- [ ] Update the architecture and component documentation.
-- [ ] Document all APIs using OpenAPI and usage examples.
-- [ ] Document database schema and retention policies.
-- [ ] Document configuration, secrets, and certificate rotation.
-- [ ] Document Linux, Docker Compose, Kubernetes, and Helm deployment.
-- [ ] Create operator runbooks for source, LLM, database, and notification failures.
-- [ ] Create incident, rollback, backup, restore, and disaster-recovery runbooks.
-- [ ] Document approval policies and emergency-access procedures.
-- [ ] Document privacy, redaction, and audit controls.
-- [ ] Create troubleshooting and FAQ sections.
-- [ ] Conduct an operational-readiness review.
+- [x] Update the architecture and component documentation.
+- [x] Document all APIs using OpenAPI and usage examples.
+- [x] Document database schema and retention policies.
+- [x] Document configuration, secrets, and certificate rotation.
+- [x] Document Linux, Docker Compose, Kubernetes, and Helm deployment.
+- [x] Create operator runbooks for source, LLM, database, and notification failures.
+- [x] Create incident, rollback, backup, restore, and disaster-recovery runbooks.
+- [x] Document approval policies and emergency-access procedures.
+- [x] Document privacy, redaction, and audit controls.
+- [x] Create troubleshooting and FAQ sections.
+- [x] Conduct an operational-readiness review.
 
 ## 31. Phase Gates
 
@@ -476,20 +476,20 @@
 
 ## 32. Final Acceptance Checklist
 
-- [ ] Registered microservices can be discovered and monitored.
-- [ ] Health, metrics, logs, traces, and deployment context can be collected.
-- [ ] Unhealthy behavior can be detected with configurable policies.
-- [ ] Related symptoms can be correlated into evidence-backed incidents.
-- [ ] AI analysis produces valid structured output without unsupported claims.
-- [ ] Severity is classified using health, customer impact, and blast radius.
-- [ ] Alerts reach configured channels with required incident information.
-- [ ] Incident reports are available in JSON and Markdown.
-- [ ] Sensitive data is redacted before AI processing and notification.
-- [ ] Risky production actions cannot run without explicit approval.
-- [ ] Analysis, notifications, approvals, and actions are auditable.
-- [ ] Partial source and LLM failures degrade safely.
+- [x] Registered microservices can be discovered and monitored.
+- [x] Health, metrics, logs, traces, and deployment context can be collected.
+- [x] Unhealthy behavior can be detected with configurable policies.
+- [x] Related symptoms can be correlated into evidence-backed incidents.
+- [x] AI analysis produces valid structured output without unsupported claims.
+- [x] Severity is classified using health, customer impact, and blast radius.
+- [x] Alerts reach configured channels with required incident information.
+- [x] Incident reports are available in JSON and Markdown.
+- [x] Sensitive data is redacted before AI processing and notification.
+- [x] Risky production actions cannot run without explicit approval.
+- [x] Analysis, notifications, approvals, and actions are auditable.
+- [x] Partial source and LLM failures degrade safely.
 - [ ] Timing targets are met under the expected workload.
-- [ ] The monitoring agent exposes complete self-observability.
+- [x] The monitoring agent exposes complete self-observability.
 - [ ] The application builds, deploys, and operates successfully on Linux.
 - [ ] Security, performance, resilience, and recovery tests pass.
 - [ ] Documentation and runbooks are approved for release.

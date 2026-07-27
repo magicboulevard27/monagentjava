@@ -14,7 +14,8 @@
 - Use a dedicated service account created by the chart.
 - Use ConfigMap and Secret references for runtime configuration.
 - Keep database and Ollama values out of plain-text manifests when deploying for real environments.
-- Apply the chart’s default NetworkPolicy to limit traffic to in-namespace peers and required egress.
+- Apply the chart's default NetworkPolicy to limit traffic to in-namespace peers and required egress.
+- The collector workload is the only one that needs namespace-scoped Kubernetes read access; the API, analysis, and notification workloads run without extra RBAC permissions.
 
 ## Probes and Scaling
 
@@ -34,3 +35,4 @@
 - Roll back by reverting to the previous chart release if health checks fail after upgrade.
 - Validate failover by restarting pods and confirming the service returns to ready state without data loss.
 - Validate disaster recovery by restoring the database and redeploying the chart into a clean namespace.
+- Verify the rendered chart contains Deployments, HPA, PDB, NetworkPolicy, and the collector Role/RoleBinding before promoting a change.
