@@ -21,5 +21,6 @@ The initial project decisions are recorded in:
 ## Operational Docs
 
 - [Dependency Outage Runbook](docs/dependency-outage-runbook.md)
+- [Observability Dashboards and Alerts](docs/observability-dashboards-and-alerts.md)
 - [Release Process](docs/release-process.md)
 - [Kubernetes and Helm Deployment](docs/kubernetes-helm.md)

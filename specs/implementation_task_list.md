@@ -343,23 +343,23 @@
 - [x] Expose `/actuator/health` and `/actuator/info`.
 - [x] Implement separate liveness and readiness health groups.
 - [x] Expose collector success and failure counters.
-- [ ] Expose source-query and AI-reasoning latency metrics.
+- [x] Expose source-query and AI-reasoning latency metrics.
 - [x] Expose notification delivery and incident-analysis metrics.
 - [x] Expose approval decision and worker queue metrics.
-- [ ] Add structured JSON logs with correlation and incident IDs.
-- [ ] Export application traces using OpenTelemetry.
-- [ ] Create dashboards for API, collectors, workers, database, and integrations.
-- [ ] Create alerts for internal failures, backlogs, latency, and error rates.
-- [ ] Verify that monitoring data contains no secrets or sensitive payloads.
+- [x] Add structured JSON logs with correlation and incident IDs.
+- [x] Export application traces using OpenTelemetry.
+- [x] Create dashboards for API, collectors, workers, database, and integrations.
+- [x] Create alerts for internal failures, backlogs, latency, and error rates.
+- [x] Verify that monitoring data contains no secrets or sensitive payloads.
 
 ## 25. Performance and Scalability
 
 - [x] Define expected service count, signal volume, incident volume, and retention.
-- [ ] Verify health-check delay remains below 30 seconds.
+- [x] Verify health-check delay remains below 30 seconds.
 - [ ] Verify alert generation remains below 60 seconds after detection.
 - [ ] Verify incident-summary generation remains below 2 minutes.
 - [ ] Load-test concurrent collection and analysis workloads.
-- [ ] Tune HTTP connection pools, executors, queue sizes, and database pools.
+- [x] Tune HTTP connection pools, executors, queue sizes, and database pools.
 - [x] Implement batching for signal and evidence persistence where appropriate.
 - [ ] Partition or archive high-volume data when required.
 - [ ] Verify horizontal scaling and duplicate-work prevention.
@@ -371,9 +371,9 @@
 - [x] Add integration tests for PostgreSQL and external adapters.
 - [ ] Add REST API contract and backward-compatibility tests.
 - [x] Add end-to-end tests from signal collection through notification.
-- [ ] Add security and authorization tests.
+- [x] Add security and authorization tests.
 - [x] Add AI evaluation and regression tests.
-- [ ] Add resilience and partial-source-failure tests.
+- [x] Add resilience and partial-source-failure tests.
 - [ ] Add Linux installation and runtime tests.
 - [ ] Add Docker Compose environment tests.
 - [ ] Add Kubernetes deployment and upgrade tests.

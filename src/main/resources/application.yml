@@ -12,6 +12,12 @@ spring:
     url: ${MONAGENT_DATASOURCE_URL:jdbc:postgresql://localhost:5432/monagent}
     username: ${MONAGENT_DATASOURCE_USERNAME:monagent}
     password: ${MONAGENT_DATASOURCE_PASSWORD:monagent}
+    hikari:
+      maximum-pool-size: ${MONAGENT_DATASOURCE_MAX_POOL_SIZE:10}
+      minimum-idle: ${MONAGENT_DATASOURCE_MIN_IDLE:2}
+      connection-timeout: ${MONAGENT_DATASOURCE_CONNECTION_TIMEOUT_MS:3000}
+      idle-timeout: ${MONAGENT_DATASOURCE_IDLE_TIMEOUT_MS:600000}
+      max-lifetime: ${MONAGENT_DATASOURCE_MAX_LIFETIME_MS:1800000}
   jpa:
     open-in-view: false
     hibernate:
@@ -49,6 +55,12 @@ management:
     web:
       exposure:
         include: health,info,metrics,prometheus
+  tracing:
+    sampling:
+      probability: ${MONAGENT_TRACING_SAMPLING_PROBABILITY:1.0}
+  otlp:
+    tracing:
+      endpoint: ${MONAGENT_TRACING_ENDPOINT:http://localhost:4317}
   endpoint:
     health:
       probes:
@@ -109,7 +121,7 @@ monagent:
   collectors:
     health:
       timeout: ${MONAGENT_HEALTH_TIMEOUT:PT5S}
-      interval-seconds: ${MONAGENT_HEALTH_INTERVAL_SECONDS:60}
+      interval-seconds: ${MONAGENT_HEALTH_INTERVAL_SECONDS:30}
       retry-count: ${MONAGENT_HEALTH_RETRY_COUNT:1}
       collect-info: ${MONAGENT_HEALTH_COLLECT_INFO:false}
     logs:

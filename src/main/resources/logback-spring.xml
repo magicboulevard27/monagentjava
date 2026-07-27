@@ -3,8 +3,8 @@
     <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="monagentjava"/>
     <springProperty scope="context" name="LOG_DIR" source="monagent.runtime.log-directory" defaultValue="./logs"/>
     <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root" defaultValue="INFO"/>
-    <springProperty scope="context" name="CONSOLE_PATTERN" source="logging.pattern.console" defaultValue="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
-    <springProperty scope="context" name="FILE_PATTERN" source="logging.pattern.file" defaultValue="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    <springProperty scope="context" name="CONSOLE_PATTERN" source="logging.pattern.console" defaultValue="{&quot;timestamp&quot;:&quot;%d{yyyy-MM-dd'T'HH:mm:ss.SSSX}&quot;,&quot;level&quot;:&quot;%level&quot;,&quot;logger&quot;:&quot;%logger{36}&quot;,&quot;thread&quot;:&quot;%thread&quot;,&quot;correlationId&quot;:&quot;%X{correlationId}&quot;,&quot;incidentId&quot;:&quot;%X{incidentId}&quot;,&quot;message&quot;:&quot;%replace(%msg){'&quot;','\\&quot;'}&quot;}%n"/>
+    <springProperty scope="context" name="FILE_PATTERN" source="logging.pattern.file" defaultValue="{&quot;timestamp&quot;:&quot;%d{yyyy-MM-dd'T'HH:mm:ss.SSSX}&quot;,&quot;level&quot;:&quot;%level&quot;,&quot;logger&quot;:&quot;%logger{36}&quot;,&quot;thread&quot;:&quot;%thread&quot;,&quot;correlationId&quot;:&quot;%X{correlationId}&quot;,&quot;incidentId&quot;:&quot;%X{incidentId}&quot;,&quot;message&quot;:&quot;%replace(%msg){'&quot;','\\&quot;'}&quot;}%n"/>
 
     <property name="LOG_FILE" value="${LOG_DIR}/${APP_NAME}.log"/>
 
